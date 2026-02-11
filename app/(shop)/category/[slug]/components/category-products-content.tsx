@@ -1,7 +1,6 @@
 import { ProductCard } from "@/components/product-card";
 import { prisma } from "@/lib/prisma";
 import { Pagination } from "@/app/(shop)/products/components/pagination";
-import { Product, ProductVariant } from "@prisma/client";
 
 interface CategoryProductsContentProps {
   categoryId: string;
@@ -9,13 +8,6 @@ interface CategoryProductsContentProps {
   sortBy: string;
   page: number;
 }
-
-type ProductWithRelations = Product & {
-  category: {
-    name: string;
-  };
-  variants: ProductVariant[];
-};
 
 export async function CategoryProductsContent({
   categoryId,
@@ -75,7 +67,7 @@ export async function CategoryProductsContent({
   return (
     <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-8">
-        {(products as ProductWithRelations[]).map((product) => (
+        {(products as any[]).map((product: any) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
