@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     });
 
     const variantMap = new Map<string, VariantWithDimensions>(
-      variants.map((v) => [v.id, v as VariantWithDimensions])
+      variants.map((v: any) => [v.id, v as VariantWithDimensions])
     );
 
     // Build enriched items with dimensions

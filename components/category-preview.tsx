@@ -1,12 +1,12 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import MaxWidthWrapper from './max-width-wrapper';
-import { prisma } from '@/lib/prisma';
+import Image from "next/image";
+import Link from "next/link";
+import MaxWidthWrapper from "./max-width-wrapper";
+import { prisma } from "@/lib/prisma";
 
 async function getCategories() {
   return prisma.category.findMany({
     take: 4,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 }
 
@@ -21,7 +21,7 @@ export default async function CategoryPreview() {
         {/* Large first category */}
         <div className="relative overflow-hidden group rounded-2xl aspect-square">
           <Image
-            src={categories[0].image || '/placeholder.jpg'}
+            src={categories[0].image || "/placeholder.jpg"}
             alt={categories[0].name}
             fill
             className="object-cover group-hover:opacity-75"
@@ -46,7 +46,7 @@ export default async function CategoryPreview() {
           {categories[1] && (
             <div className="relative overflow-hidden group rounded-2xl">
               <Image
-                src={categories[1].image || '/placeholder.jpg'}
+                src={categories[1].image || "/placeholder.jpg"}
                 alt={categories[1].name}
                 fill
                 className="object-cover group-hover:opacity-75"
@@ -68,13 +68,13 @@ export default async function CategoryPreview() {
 
           {/* Remaining categories */}
           <div className="h-full grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
-            {categories.slice(2).map((category) => (
+            {categories.slice(2).map((category: any) => (
               <div
                 key={category.id}
                 className="relative overflow-hidden group rounded-2xl aspect-square"
               >
                 <Image
-                  src={category.image || '/placeholder.jpg'}
+                  src={category.image || "/placeholder.jpg"}
                   alt={category.name}
                   fill
                   className="object-cover group-hover:opacity-75"

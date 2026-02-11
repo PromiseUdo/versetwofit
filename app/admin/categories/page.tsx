@@ -1,9 +1,9 @@
 // src/app/admin/categories/page.tsx
-import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
-import Image from 'next/image';
-import { format } from 'date-fns';
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import Image from "next/image";
+import { format } from "date-fns";
 
 export default async function CategoriesPage() {
   const categories = await prisma.category.findMany({
@@ -12,7 +12,7 @@ export default async function CategoriesPage() {
         select: { products: true },
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 
   return (
@@ -56,7 +56,7 @@ export default async function CategoriesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category) => (
+          {categories.map((category: any) => (
             <Link
               key={category.id}
               href={`/admin/categories/${category.id}`}
@@ -92,11 +92,11 @@ export default async function CategoriesPage() {
 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {category._count.products}{' '}
-                    {category._count.products === 1 ? 'product' : 'products'}
+                    {category._count.products}{" "}
+                    {category._count.products === 1 ? "product" : "products"}
                   </span>
                   <span className="text-xs text-gray-500 dark:text-gray-500">
-                    {format(new Date(category.createdAt), 'MMM dd, yyyy')}
+                    {format(new Date(category.createdAt), "MMM dd, yyyy")}
                   </span>
                 </div>
               </div>

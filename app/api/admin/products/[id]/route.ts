@@ -383,7 +383,7 @@ export async function PUT(
     }
 
     // Check if any new SKU already exists (excluding current product's SKUs)
-    const existingVariantSkus = existingProduct.variants.map((v) => v.sku);
+    const existingVariantSkus = existingProduct.variants.map((v: any) => v.sku);
     const newSkus = skus.filter(
       (sku: string) => !existingVariantSkus.includes(sku)
     );

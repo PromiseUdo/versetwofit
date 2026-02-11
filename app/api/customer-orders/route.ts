@@ -53,7 +53,7 @@ export async function GET(request: Request) {
     ]);
 
     // Format response
-    const formattedOrders = orders.map((order) => ({
+    const formattedOrders = orders.map((order: any) => ({
       id: order.id,
       orderNumber: order.orderNumber,
       status: order.status,
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       totalAmount: order.totalAmount,
       itemCount: order.items.length,
       createdAt: order.createdAt.toISOString(),
-      items: order.items.map((item) => ({
+      items: order.items.map((item: any) => ({
         id: item.id,
         name: item.name,
         image: item.image,

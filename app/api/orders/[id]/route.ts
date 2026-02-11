@@ -64,7 +64,7 @@ export async function GET(
       shippingCountry: order.shippingCountry,
       billingAddress: order.billingAddress,
       createdAt: order.createdAt.toISOString(),
-      items: order.items.map((item) => ({
+      items: order.items.map((item: any) => ({
         id: item.id,
         name: item.name,
         image: item.image,

@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
 
     // Create a lookup map for dimensions
     const variantDimensionsMap = new Map(
-      variantDimensions.map((v) => [v.id, { length: v.length, width: v.width, height: v.height, weight: v.weight }])
+      variantDimensions.map((v: any) => [v.id, { length: v.length, width: v.width, height: v.height, weight: v.weight }])
     );
 
     // Enrich items with dimension data
