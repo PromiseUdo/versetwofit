@@ -1,7 +1,7 @@
 // src/app/products/[slug]/page.tsx
-import { prisma } from '@/lib/prisma';
-import ProductClient from './components/product-client';
-import { notFound } from 'next/navigation';
+import { prisma } from "@/lib/prisma";
+import ProductClient from "./components/product-client";
+import { notFound } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -38,7 +38,7 @@ export default async function ProductPage({ params }: PageProps) {
       name: product.category.name,
       slug: product.category.slug,
     },
-    variants: product.variants.map((variant) => ({
+    variants: product.variants.map((variant: any) => ({
       id: variant.id,
       color: variant.color,
       size: variant.size,
@@ -68,7 +68,7 @@ export default async function ProductPage({ params }: PageProps) {
   });
 
   // Format related products for ProductCard
-  const formattedRelatedProducts = relatedProducts.map((p) => ({
+  const formattedRelatedProducts = relatedProducts.map((p: any) => ({
     id: p.id,
     name: p.name,
     slug: p.slug,
@@ -78,7 +78,7 @@ export default async function ProductPage({ params }: PageProps) {
     category: {
       name: p.category.name,
     },
-    variants: p.variants.map((v) => ({
+    variants: p.variants.map((v: any) => ({
       id: v.id,
       color: v.color,
       size: v.size,
@@ -87,7 +87,12 @@ export default async function ProductPage({ params }: PageProps) {
     })),
   }));
 
-  return <ProductClient product={formattedProduct} relatedProducts={formattedRelatedProducts} />;
+  return (
+    <ProductClient
+      product={formattedProduct}
+      relatedProducts={formattedRelatedProducts}
+    />
+  );
 }
 
 // Generate metadata for SEO
@@ -106,7 +111,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!product) {
     return {
-      title: 'Product Not Found',
+      title: "Product Not Found",
     };
   }
 
@@ -117,7 +122,7 @@ export async function generateMetadata({ params }: PageProps) {
       title: product.name,
       description: product.description,
       images: product.images.length > 0 ? [product.images[0]] : [],
-      type: 'website',
+      type: "website",
     },
   };
 }
