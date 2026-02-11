@@ -1,345 +1,6 @@
-// 'use client';
-
-// import { useState } from 'react';
-// import Image from 'next/image';
-// import MaxWidthWrapper from '@/components/max-width-wrapper';
-// import {
-//   IconAlertCircle,
-//   IconBrandFacebook,
-//   IconBrandTwitter,
-//   IconBrandWhatsapp,
-//   IconHeart,
-//   IconLock,
-//   IconMinus,
-//   IconPackage,
-//   IconPlus,
-//   IconShoppingCart,
-// } from '@tabler/icons-react';
-// import { DirectionAwareHover } from '@/components/ui/direction-aware-hover';
-// import RelatedProducts from './related-products';
-// import { Product } from '@prisma/client';
-
-// type ColorOption = {
-//   name: string;
-//   ring: string;
-//   bg: string;
-// };
-
-// const images = ['/hero1.jpg', '/hero1.jpg', '/hero1.jpg', '/hero1.jpg'];
-
-// const colors: ColorOption[] = [
-//   { name: 'Black', ring: 'ring-zinc-700', bg: 'bg-zinc-400' },
-//   { name: 'Gray', ring: 'ring-zinc-300', bg: 'bg-zinc-200' },
-//   { name: 'Purple', ring: 'ring-purple-300', bg: 'bg-purple-200' },
-//   { name: 'Pink', ring: 'ring-pink-300', bg: 'bg-pink-200' },
-// ];
-
-// const sizes = {
-//   US: ['6', '7', '8', '9', '10', '11'],
-//   EU: ['39', '40', '41', '42', '43', '44'],
-// };
-
-// const about = ['We are good'];
-
-// const specifications = [{ label: 'Material', value: 'Silicone' }];
-
-// const description = 'The content to be rendered inside the component.';
-
-// export default function ProductClient({ product }: { product: Product }) {
-//   const [activeImage, setActiveImage] = useState(0);
-//   const [activeColor, setActiveColor] = useState<string | null>(null);
-//   const [sizeSystem, setSizeSystem] = useState<'US' | 'EU'>('US');
-//   const [activeSize, setActiveSize] = useState<string | null>(null);
-//   const [quantity, setQuantity] = useState(1);
-
-//   return (
-//     <>
-//       <div className="fixed top-0 left-0 right-0 h-48 bg-linear-to-b from-black/80 via-black/30 to-transparent pointer-events-none z-10" />
-
-//       {/* <div className="fixed top-0 left-0 right-0 h-56 bg-linear-to-b from-black/90 via-black/40 to-transparent pointer-events-none z-10" /> */}
-
-//       <MaxWidthWrapper className="my-24">
-//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-zinc-900">
-//           {/* Image Gallery */}
-//           <div className="flex flex-col lg:sticky lg:top-24 gap-2">
-//             <div className="overflow-hidden aspect-square bg-zinc-100 rounded-2xl relative">
-//               <DirectionAwareHover
-//                 imageUrl={images[activeImage]}
-//                 imageClassName="object-cover"
-//               >
-//                 <></>
-//               </DirectionAwareHover>
-//             </div>
-
-//             <div className="grid grid-cols-6 gap-2">
-//               {images.map((image, index) => (
-//                 <button
-//                   key={index}
-//                   onClick={() => setActiveImage(index)}
-//                   className={`overflow-hidden rounded-xl aspect-square bg-zinc-100 relative border ${
-//                     activeImage === index
-//                       ? 'ring-2 ring-zinc-900'
-//                       : 'border-zinc-200'
-//                   }`}
-//                 >
-//                   <Image src={image} alt="" fill className="object-cover" />
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-
-//           {/* Product Details */}
-//           <div className="flex flex-col">
-//             <h1 className=" text-zinc-600 text-xl md:text-2xl font-semibold">
-//               Nike Air Force 1´07 Fresh
-//             </h1>
-//             <p className="mt-1 font-medium text-zinc-600">
-//               <del className="opacity-40">$190</del>
-//               $152 -<span className="text-green-400">20% Off</span>
-//             </p>
-
-//             <p className="mt-4 text-zinc-600">
-//               Hitting the field in the late ’60s, adidas airmaxS quickly became
-//               soccer&apos;s “it” shoe.
-//             </p>
-
-//             {/* Options */}
-//             <div className="flex flex-col mt-6 gap-6">
-//               {/* Color */}
-//               <div>
-//                 <p className="uppercase text-sm text-zinc-600">Color</p>
-//                 <div className="mt-2 flex flex-wrap gap-3">
-//                   {colors.map((color) => (
-//                     <button
-//                       key={color.name}
-//                       onClick={() => setActiveColor(color.name)}
-//                       className={`rounded-full p-0.5 ${
-//                         activeColor === color.name
-//                           ? 'ring-2 ring-offset-2 ring-zinc-900'
-//                           : ''
-//                       }`}
-//                     >
-//                       <span
-//                         className={`block size-6 rounded-full ring-1 ${color.ring} ${color.bg}`}
-//                       />
-//                     </button>
-//                   ))}
-//                 </div>
-//               </div>
-
-//               {/* Size */}
-//               <div>
-//                 <div className="flex items-center justify-between">
-//                   <p className="uppercase text-sm text-zinc-600">Shoe size</p>
-//                   <select
-//                     value={sizeSystem}
-//                     onChange={(e) => {
-//                       setSizeSystem(e.target.value as 'US' | 'EU');
-//                       setActiveSize(null);
-//                     }}
-//                     className="h-8 px-2 bg-white border border-zinc-300 rounded-md text-sm"
-//                   >
-//                     <option value="US">US</option>
-//                     <option value="EU">EU</option>
-//                   </select>
-//                 </div>
-
-//                 <div className="mt-2 grid grid-cols-4 gap-2">
-//                   {sizes[sizeSystem].map((size) => (
-//                     <button
-//                       key={size}
-//                       onClick={() => setActiveSize(size)}
-//                       className={`px-3 py-2 rounded-md border text-sm font-medium ${
-//                         activeSize === size
-//                           ? 'bg-zinc-900 text-white border-zinc-900'
-//                           : 'bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100'
-//                       }`}
-//                     >
-//                       {size}
-//                     </button>
-//                   ))}
-//                 </div>
-//               </div>
-
-//               <div className="flex flex-col items-start gap-1.5">
-//                 <p className="uppercase text-sm text-zinc-600">Units</p>
-//                 <div className="flex items-center  border border-gray-300 rounded-lg overflow-hidden">
-//                   <button
-//                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-//                     className="p-2 hover:bg-gray-100 transition-colors"
-//                     aria-label="Decrease"
-//                   >
-//                     <IconMinus size={16} />
-//                   </button>
-//                   <span className="px-4 py-1 text-sm font-medium min-w-12 text-center">
-//                     {quantity}
-//                   </span>
-//                   <button
-//                     onClick={() => setQuantity(quantity + 1)}
-//                     className="p-2 hover:bg-gray-100 transition-colors"
-//                     aria-label="Increase"
-//                   >
-//                     <IconPlus size={16} />
-//                   </button>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Actions */}
-//             <div className="flex mt-8 gap-2">
-//               <button className="h-9 w-full rounded-md bg-zinc-900 text-white hover:bg-zinc-800">
-//                 Add to Cart
-//               </button>
-//               <button className="h-9 w-full rounded-md border border-zinc-300 hover:bg-zinc-100">
-//                 Buy Now
-//               </button>
-//             </div>
-
-//             {/* <p className="mt-2 text-sm text-zinc-600">Free shipping over $50</p> */}
-//             <div className="mt-3 flex items-center gap-3">
-//               <a href="#" aria-label="Share on Facebook">
-//                 <IconBrandFacebook size={18} strokeWidth={1.5} />
-//               </a>
-
-//               <a href="#" aria-label="Share on Twitter">
-//                 <IconBrandTwitter size={18} strokeWidth={1.5} />
-//               </a>
-
-//               <a href="#" aria-label="Share on WhatsApp">
-//                 <IconBrandWhatsapp size={18} strokeWidth={1.5} />
-//               </a>
-//             </div>
-
-//             {/* Accordions */}
-//             <div className="mt-8 divide-y divide-zinc-200">
-//               {[
-//                 // {
-//                 //   title: 'Details',
-//                 //   content: 'High-quality materials and comfort.',
-//                 // },
-//                 { title: 'Shipping', content: 'Free shipping over $50.' },
-//                 { title: 'Returns', content: '30-day return policy.' },
-//               ].map((section) => (
-//                 <details key={section.title} className="py-4">
-//                   <summary className="cursor-pointer font-medium">
-//                     {section.title}
-//                   </summary>
-//                   <p className="mt-2 text-zinc-600">{section.content}</p>
-//                 </details>
-//               ))}
-//             </div>
-
-//             {/* social media icons here */}
-
-//             {/* Social Share */}
-//           </div>
-//         </div>
-
-//         <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
-//           {/* LEFT: Description + Specs (9 cols on desktop) */}
-//           <div className="bg-white  rounded-md border border-[#B5844A]/20  p-3 sm:p-8 lg:col-span-9 space-y-8">
-//             {/* Product Description */}
-//             <div>
-//               <h2 className="text-xl font-semibold text-gray-900 mb-3">
-//                 Product Description
-//               </h2>
-//               <div className="prose prose-sm max-w-none text-gray-700  text-sm leading-relaxed">
-//                 {description}
-//               </div>
-//             </div>
-
-//             {/* Specifications Table */}
-//             <div className="bg-gray-50 p-6 rounded-lg">
-//               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-//                 Specifications
-//               </h3>
-//               <table className="w-full text-sm text-gray-700">
-//                 <tbody>
-//                   {(specifications ?? []).map(
-//                     (spec: { label: string; value: string }, idx: number) => (
-//                       <tr
-//                         key={idx}
-//                         className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-//                       >
-//                         <td className="py-2 pr-4 text-sm font-medium text-gray-900">
-//                           {spec.label}
-//                         </td>
-//                         <td className="py-2 pl-4 text-sm ">{spec.value}</td>
-//                       </tr>
-//                     )
-//                   )}
-//                 </tbody>
-//               </table>
-//             </div>
-
-//             {/* About This Item */}
-//             <div>
-//               <h3 className="text-lg font-medium text-gray-900 mb-3">
-//                 About this item
-//               </h3>
-//               <ul className="space-y-2 text-sm text-gray-700">
-//                 {about.map((item: string, idx: number) => (
-//                   <li key={idx} className="flex items-start">
-//                     <span className="mr-2 text-[#B5844A]">•</span>
-//                     <span>{item}</span>
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-//           </div>
-
-//           <div className="lg:col-span-3 space-y-6">
-//             <div className="bg-gradient-to-br rounded-md from-[#B5844A]/5 to-[#d4a574]/5 p-3 sm:p-8  border border-[#B5844A]/20">
-//               <h3 className="text-lg font-semibold text-gray-900 mb-5">
-//                 Why Shop With Us?
-//               </h3>
-//               <div className="space-y-5">
-//                 {[
-//                   {
-//                     Icon: IconPackage,
-//                     title: 'Discreet Packaging',
-//                     desc: 'Plain box, no product name or branding visible.',
-//                   },
-//                   {
-//                     Icon: IconHeart,
-//                     title: 'Pleasure Guarantee',
-//                     desc: 'Love it or we’ll make it right — no returns needed.',
-//                   },
-//                   {
-//                     Icon: IconLock,
-//                     title: 'Secure Payment',
-//                     desc: 'Encrypted checkout, 100% safe.',
-//                   },
-//                 ].map(({ Icon, title, desc }, idx) => (
-//                   <div key={idx} className="flex gap-3">
-//                     <div className="flex-shrink-0 mt-0.5">
-//                       <Icon
-//                         size={24}
-//                         className="text-[#B5844A]"
-//                         strokeWidth={1.5}
-//                       />
-//                     </div>
-//                     <div>
-//                       <p className="font-medium text-gray-900">{title}</p>
-//                       <p className="text-xs text-gray-600 mt-0.5">{desc}</p>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ===========RELATED PRODUCT REEL - use product card */}
-//         <RelatedProducts />
-//       </MaxWidthWrapper>
-//     </>
-//   );
-// }
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import MaxWidthWrapper from '@/components/max-width-wrapper';
 import {
@@ -347,20 +8,21 @@ import {
   IconBrandTwitter,
   IconBrandWhatsapp,
   IconHeart,
-  IconLock,
   IconMinus,
-  IconPackage,
   IconPlus,
   IconCheck,
   IconShoppingCart,
+  IconPackage,
+  IconLock,
 } from '@tabler/icons-react';
 import { DirectionAwareHover } from '@/components/ui/direction-aware-hover';
-import RelatedProducts from './related-products';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cart-store';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
+import { ProductCard } from '@/components/product-card';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 type ProductVariant = {
   id: string;
@@ -369,6 +31,10 @@ type ProductVariant = {
   sku: string;
   stock: number;
   price: number | null;
+  length: number | null;
+  width: number | null;
+  height: number | null;
+  weight: number | null;
 };
 
 type ProductSpecification = {
@@ -396,15 +62,36 @@ type FormattedProduct = {
   updatedAt: string;
 };
 
+type RelatedProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  comparePrice: number | null;
+  images: string[];
+  category: {
+    name: string;
+  };
+  variants: {
+    id: string;
+    color: string | null;
+    size: string | null;
+    stock: number;
+    price: number | null;
+  }[];
+};
+
 export default function ProductClient({
   product,
+  relatedProducts = [],
 }: {
   product: FormattedProduct;
+  relatedProducts?: RelatedProduct[];
 }) {
   const router = useRouter();
   const { data: session } = useSession();
-
   const addItem = useCartStore((state) => state.addItem);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [activeImage, setActiveImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
@@ -428,7 +115,6 @@ export default function ProductClient({
     availableSizes[0] || null
   );
 
-  // Update selected variant when color/size changes
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
     const variant = product.variants.find(
@@ -455,7 +141,6 @@ export default function ProductClient({
     ? Math.round(((comparePrice - finalPrice) / comparePrice) * 100)
     : 0;
 
-  // Add to Cart Handler
   const handleAddToCart = async () => {
     if (!selectedVariant) {
       toast.error('Please select a variant');
@@ -475,7 +160,6 @@ export default function ProductClient({
     setIsAddingToCart(true);
 
     try {
-      // Add to cart store
       addItem({
         id: selectedVariant.id,
         productId: product.id,
@@ -488,9 +172,12 @@ export default function ProductClient({
         quantity: quantity,
         image: product.images[0] || '/placeholder.jpg',
         stock: selectedVariant.stock,
+        length: selectedVariant.length,
+        width: selectedVariant.width,
+        height: selectedVariant.height,
+        weight: selectedVariant.weight,
       });
 
-      // Build variant description
       const variantDesc = [selectedVariant.color, selectedVariant.size]
         .filter(Boolean)
         .join(', ');
@@ -505,7 +192,6 @@ export default function ProductClient({
         { duration: 3000 }
       );
 
-      // Reset quantity to 1 after adding
       setQuantity(1);
     } catch (error) {
       console.error('Add to cart error:', error);
@@ -515,7 +201,6 @@ export default function ProductClient({
     }
   };
 
-  // Buy Now Handler
   const handleBuyNow = async () => {
     if (!selectedVariant) {
       toast.error('Please select a variant');
@@ -527,14 +212,10 @@ export default function ProductClient({
       return;
     }
 
-    // Add to cart first
     await handleAddToCart();
-
-    // Then redirect to checkout
     router.push('/checkout');
   };
 
-  // Add to Wishlist Handler
   const handleAddToWishlist = async () => {
     if (!session) {
       router.push('/login');
@@ -551,6 +232,14 @@ export default function ProductClient({
       } else {
         toast.error(error.response?.data?.error || 'Failed to add to wishlist');
       }
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const { current } = scrollContainerRef;
+      const scrollAmount = direction === 'left' ? -300 : 300;
+      current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
@@ -625,7 +314,7 @@ export default function ProductClient({
                         onClick={() => handleColorChange(color!)}
                         className={`px-4 py-2 rounded-md border text-sm font-medium transition-all ${
                           selectedColor === color
-                            ? 'bg-zinc-900 text-white border-zinc-900'
+                            ? 'bg-primary text-primary-foreground border-primary'
                             : 'bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100'
                         }`}
                       >
@@ -647,7 +336,7 @@ export default function ProductClient({
                         onClick={() => handleSizeChange(size!)}
                         className={`px-3 py-2 rounded-md border text-sm font-medium transition-all ${
                           selectedSize === size
-                            ? 'bg-zinc-900 text-white border-zinc-900'
+                            ? 'bg-primary text-primary-foreground border-primary'
                             : 'bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100'
                         }`}
                       >
@@ -719,8 +408,7 @@ export default function ProductClient({
                   selectedVariant.stock === 0 ||
                   isAddingToCart
                 }
-                className="h-11 w-full rounded-md bg-zinc-900 text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
-                // disabled={!selectedVariant || selectedVariant.stock === 0}
+                className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
               >
                 {isAddingToCart ? (
                   <>
@@ -741,8 +429,7 @@ export default function ProductClient({
                   selectedVariant.stock === 0 ||
                   isAddingToCart
                 }
-                className="h-11 w-full rounded-md border-2 border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                // disabled={!selectedVariant || selectedVariant.stock === 0}
+                className="h-11 w-full rounded-md border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
                 Buy Now
               </button>
@@ -801,61 +488,48 @@ export default function ProductClient({
               </div>
             </div>
 
-            {/* About This Item */}
-            {product.aboutItems && product.aboutItems.length > 0 && (
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 p-6 rounded-lg border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  {/* <span className="w-1 h-6 bg-[#B5844A] rounded-full"></span> */}
-                  About this item
-                </h3>
-                <ul className="space-y-3">
-                  {product.aboutItems.map((item: string, idx: number) => (
-                    <li key={idx} className="flex items-center gap-3">
-                      <span className="flex-shrink-0 mt-1 w-1.5 h-1.5 rounded-full bg-[#B5844A]"></span>
-                      <span className="text-sm text-gray-700 leading-relaxed">
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             {/* Specifications Table */}
-            {product.specifications && product.specifications.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  {/* <span className="w-1 h-6 bg-[#B5844A] rounded-full"></span> */}
-                  Specifications
-                </h3>
-                <div className="overflow-hidden rounded-lg border border-gray-200">
-                  <table className="w-full text-sm">
-                    <tbody className="divide-y divide-gray-200">
-                      {product.specifications.map(
-                        (spec: ProductSpecification, idx: number) => (
-                          <tr
-                            key={idx}
-                            className="hover:bg-gray-50 transition-colors"
-                          >
-                            <td className="py-3 px-4 font-medium text-gray-900 bg-gray-50 w-1/3">
-                              {spec.key}
-                            </td>
-                            <td className="py-3 px-4 text-gray-700 bg-white">
-                              {spec.value}
-                            </td>
-                          </tr>
-                        )
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Specifications
+              </h3>
+              <table className="w-full text-sm text-gray-700">
+                <tbody>
+                  {(product.specifications ?? []).map(
+                    (spec, idx) => (
+                      <tr
+                        key={idx}
+                        className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                      >
+                        <td className="py-2 pr-4 text-sm font-medium text-gray-900">
+                          {spec.key}
+                        </td>
+                        <td className="py-2 pl-4 text-sm ">{spec.value}</td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* About This Item */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                About this item
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-700">
+                {(product.aboutItems || []).map((item, idx) => (
+                  <li key={idx} className="flex items-start">
+                    <span className="mr-2 text-[#B5844A]">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          {/* RIGHT: Why Shop With Us (3 cols on desktop) */}
           <div className="lg:col-span-3 space-y-6">
-            <div className="bg-gradient-to-br rounded-md from-[#B5844A]/5 to-[#d4a574]/5 p-3 sm:p-8  border border-[#B5844A]/20">
+            <div className="bg-primary/5 rounded-md p-3 sm:p-8 border border-primary/20">
               <h3 className="text-lg font-semibold text-gray-900 mb-5">
                 Why Shop With Us?
               </h3>
@@ -863,25 +537,25 @@ export default function ProductClient({
                 {[
                   {
                     Icon: IconPackage,
-                    title: 'Discreet Packaging',
-                    desc: 'Plain box, no product name or branding visible.',
+                    title: 'Fast & Secure Shipping',
+                    desc: 'Quick and reliable delivery to your doorstep.',
                   },
                   {
                     Icon: IconHeart,
-                    title: 'Pleasure Guarantee',
-                    desc: 'Love it or we’ll make it right — no returns needed.',
+                    title: 'Premium Quality Guarantee',
+                    desc: 'We use only the finest materials for our collections.',
                   },
                   {
                     Icon: IconLock,
-                    title: 'Secure Payment',
-                    desc: 'Encrypted checkout, 100% safe.',
+                    title: '100% Secure Checkout',
+                    desc: 'Your payment information is always protected.',
                   },
                 ].map(({ Icon, title, desc }, idx) => (
                   <div key={idx} className="flex gap-3">
                     <div className="flex-shrink-0 mt-0.5">
                       <Icon
                         size={24}
-                        className="text-[#B5844A]"
+                        className="text-primary"
                         strokeWidth={1.5}
                       />
                     </div>
@@ -896,8 +570,47 @@ export default function ProductClient({
           </div>
         </div>
 
-        {/* Related Products */}
-        {/* <RelatedProducts categoryId={product.category.id} currentProductId={product.id} /> */}
+        {/* Related Products Section */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-24 border-t border-gray-100 pt-16">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-gray-900">
+                You May Also Like
+              </h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => scroll('left')}
+                  className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+                  aria-label="Scroll left"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scroll('right')}
+                  className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+                  aria-label="Scroll right"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {relatedProducts.map((relatedProduct) => (
+                <div
+                  key={relatedProduct.id}
+                  className="flex-none w-[280px] snap-start"
+                >
+                  <ProductCard product={relatedProduct} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </MaxWidthWrapper>
     </>
   );

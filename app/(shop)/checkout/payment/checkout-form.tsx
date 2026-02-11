@@ -83,7 +83,7 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-8">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto text-indigo-600 mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary mb-4" />
           <p className="text-gray-600">Loading payment form...</p>
         </div>
       </div>
@@ -91,12 +91,12 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className=" rounded-xl shadow-sm p-6  ">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-            <CreditCard className="w-6 h-6 text-indigo-600" />
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+            <CreditCard className="w-6 h-6 text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
@@ -109,17 +109,17 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
         </div>
 
         {/* Security Badges */}
-        <div className="flex items-center justify-center gap-6 py-4 border-t border-b bg-gray-50 rounded-lg">
+        <div className="px-4 flex items-center justify-center gap-6 py-4 border-t border-b bg-gray-50 ">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Lock className="w-4 h-4 text-green-600" />
+            <Lock className="w-4 h-4 text-primary" />
             <span>SSL Encrypted</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <ShieldCheck className="w-4 h-4 text-green-600" />
+            <ShieldCheck className="w-4 h-4 text-primary" />
             <span>Secure Checkout</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <CreditCard className="w-4 h-4 text-green-600" />
+            <CreditCard className="w-4 h-4 text-primary" />
             <span>PCI Compliant</span>
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
               className={`mb-4 p-4 rounded-lg flex items-start gap-3 ${
                 message.includes('error') || message.includes('failed')
                   ? 'bg-red-50 border border-red-200 text-red-800'
-                  : 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : 'bg-primary/5 border border-primary/20 text-primary'
               }`}
             >
               <Lock className="w-5 h-5 flex-shrink-0 mt-0.5" />
@@ -161,7 +161,7 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
           <button
             type="submit"
             disabled={isLoading || !stripe || !elements}
-            className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -189,17 +189,17 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
           <div className="text-center">
-            <Lock className="w-8 h-8 mx-auto text-green-600 mb-2" />
+            <Lock className="w-8 h-8 mx-auto text-primary mb-2" />
             <p className="font-medium text-gray-900">256-bit SSL</p>
             <p>Bank-level encryption</p>
           </div>
           <div className="text-center">
-            <ShieldCheck className="w-8 h-8 mx-auto text-green-600 mb-2" />
+            <ShieldCheck className="w-8 h-8 mx-auto text-primary mb-2" />
             <p className="font-medium text-gray-900">PCI Compliant</p>
             <p>Highest security standards</p>
           </div>
           <div className="text-center">
-            <CreditCard className="w-8 h-8 mx-auto text-green-600 mb-2" />
+            <CreditCard className="w-8 h-8 mx-auto text-primary mb-2" />
             <p className="font-medium text-gray-900">Secure Processing</p>
             <p>Powered by Stripe</p>
           </div>
@@ -210,7 +210,7 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
       <div className="text-center">
         <p className="text-sm text-gray-600 mb-3">We accept</p>
         <div className="flex items-center justify-center gap-3 flex-wrap">
-          {['Visa', 'Mastercard', 'American Express', 'Discover'].map(
+          {['Visa', 'Mastercard', ].map(
             (card) => (
               <div
                 key={card}

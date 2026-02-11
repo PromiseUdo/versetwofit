@@ -264,6 +264,10 @@ interface Variant {
   size: string | null;
   stock: number;
   price: number | null;
+  length?: number | null;
+  width?: number | null;
+  height?: number | null;
+  weight?: number | null;
   // sku: string;
 }
 
@@ -343,6 +347,10 @@ export function ProductCard({ product }: ProductCardProps) {
       quantity: 1,
       image: product.images[0] || '/hero1.jpg',
       stock: availableVariant.stock,
+      length: availableVariant.length ?? null,
+      width: availableVariant.width ?? null,
+      height: availableVariant.height ?? null,
+      weight: availableVariant.weight ?? null,
     });
 
     toast.success(
@@ -447,7 +455,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 className={cn(
                   'px-4 py-2 flex-1 flex items-center gap-2 justify-center rounded-md border border-[#f3f3f3] text-[#f3f3f3] text-sm transition duration-200',
                   totalStock > 0
-                    ? 'hover:border-black hover:bg-[#f3f3f3] hover:text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)]'
+                    ? 'hover:border-primary hover:bg-[#f3f3f3] hover:text-primary hover:shadow-[4px_4px_0px_0px_var(--color-primary)]'
                     : 'opacity-50 cursor-not-allowed'
                 )}
               >

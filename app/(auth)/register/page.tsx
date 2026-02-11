@@ -1,54 +1,55 @@
 // ============================================
 // src/app/(auth)/register/page.tsx - COMPLETE REGISTER PAGE
 // ============================================
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { User, Mail, Lock, UserPlus, AlertCircle, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
-import axios from 'axios';
-import { Input } from '@/components/ui/input';
-import LabelInputContainer from '@/components/ui/label-input-container';
-import { Label } from '@/components/ui/label';
-import BottomGradient from '@/components/ui/bottom-gradient';
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { User, Mail, Lock, UserPlus, AlertCircle, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { Input } from "@/components/ui/input";
+import LabelInputContainer from "@/components/ui/label-input-container";
+import { Label } from "@/components/ui/label";
+import BottomGradient from "@/components/ui/bottom-gradient";
 import {
   IconBrandGithub,
   IconBrandGoogle,
   IconBrandOnlyfans,
-} from '@tabler/icons-react';
-import { Spotlight } from '@/components/ui/spotlight-new';
-import { LoaderFive } from '@/components/ui/loader';
+} from "@tabler/icons-react";
+import { Spotlight } from "@/components/ui/spotlight-new";
+import { LoaderFive } from "@/components/ui/loader";
+import { NavbarLogo } from "@/components/ui/resizable-navbar";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      if (session.user.role === 'ADMIN') {
-        router.push('/admin');
+    if (status === "authenticated" && session?.user) {
+      if (session.user.role === "ADMIN") {
+        router.push("/admin");
       } else {
-        router.push('/');
+        router.push("/");
       }
     }
   }, [status, session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     // Validation
     if (
@@ -57,28 +58,28 @@ export default function RegisterPage() {
       !formData.password ||
       !formData.confirmPassword
     ) {
-      setError('Please fill in all fields');
+      setError("Please fill in all fields");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError("Password must be at least 6 characters long");
       return;
     }
 
     if (formData.name.length < 2) {
-      setError('Name must be at least 2 characters long');
+      setError("Name must be at least 2 characters long");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError('Please enter a valid email address');
+      setError("Please enter a valid email address");
       return;
     }
 
@@ -86,17 +87,17 @@ export default function RegisterPage() {
 
     try {
       // Register the user
-      const registerResponse = await axios.post('/api/auth/register', {
+      const registerResponse = await axios.post("/api/auth/register", {
         name: formData.name.trim(),
         email: formData.email.toLowerCase(),
         password: formData.password,
       });
 
       if (registerResponse.status === 201) {
-        toast.success('Account created successfully!');
+        toast.success("Account created successfully!");
 
         // Automatically sign in the user
-        const signInResult = await signIn('credentials', {
+        const signInResult = await signIn("credentials", {
           email: formData.email.toLowerCase(),
           password: formData.password,
           redirect: false,
@@ -104,21 +105,21 @@ export default function RegisterPage() {
 
         if (signInResult?.error) {
           setError(
-            'Account created but sign-in failed. Please try logging in.'
+            "Account created but sign-in failed. Please try logging in.",
           );
-          toast.error('Please try logging in manually');
+          toast.error("Please try logging in manually");
           setTimeout(() => {
-            router.push('/login');
+            router.push("/login");
           }, 2000);
         } else if (signInResult?.ok) {
-          toast.success('Logged in successfully!');
+          toast.success("Logged in successfully!");
           // The useEffect will handle the redirect
         }
       }
     } catch (error: any) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
       const errorMessage =
-        error.response?.data?.error || 'Registration failed. Please try again.';
+        error.response?.data?.error || "Registration failed. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -127,27 +128,27 @@ export default function RegisterPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    setError('');
+    setError("");
     setIsGoogleLoading(true);
 
     try {
-      await signIn('google', {
+      await signIn("google", {
         redirect: false,
       });
     } catch (error) {
-      console.error('Google sign-in error:', error);
-      setError('Failed to sign in with Google');
-      toast.error('Failed to sign in with Google');
+      console.error("Google sign-in error:", error);
+      setError("Failed to sign in with Google");
+      toast.error("Failed to sign in with Google");
       setIsGoogleLoading(false);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setError('');
+    setError("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-100">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
@@ -156,15 +157,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-black px-4 overflow-hidden relative">
       <Spotlight />
 
       <div className="shadow-input mx-auto w-full max-w-md rounded-none  p-4 md:rounded-2xl md:p-8 bg-black">
-        <h2 className="text-center text-xl font-bold text-neutral-800 dark:text-neutral-200">
-          Vrse Two
-        </h2>
-        <p className="text-center mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
-          Create your account and enjoy premium deals!
+        <div className="flex items-center justify-center">
+          <NavbarLogo />
+        </div>
+        <p className="text-lg font-semibold text-center mt-2 max-w-sm  text-neutral-600 dark:text-neutral-300">
+          Create Your Account
         </p>
 
         <form onSubmit={handleSubmit} className="my-8 space-y-5">
@@ -310,10 +311,10 @@ export default function RegisterPage() {
       </div> */}
 
         <p className="mt-8 text-center text-sm text-gray-600">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link
             href="/login"
-            className="text-purple-600 font-semibold hover:text-purple-700"
+            className="text-white font-semibold hover:text-purple-700"
           >
             Sign in
           </Link>

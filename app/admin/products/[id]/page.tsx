@@ -111,8 +111,12 @@ export default function EditProductPage() {
                 sku: v.sku || '',
                 stock: v.stock?.toString() || '0',
                 price: v.price?.toString() || '',
+                length: v.length?.toString() || '',
+                width: v.width?.toString() || '',
+                height: v.height?.toString() || '',
+                weight: v.weight?.toString() || '',
               }))
-            : [{ color: '', size: '', sku: '', stock: '0', price: '' }];
+            : [{ color: '', size: '', sku: '', stock: '0', price: '', length: '', width: '', height: '', weight: '' }];
 
         setValue('variants', formattedVariants);
 
@@ -625,6 +629,10 @@ export default function EditProductPage() {
                   sku: '',
                   stock: '0',
                   price: '',
+                  length: '',
+                  width: '',
+                  height: '',
+                  weight: '',
                 })
               }
               className="flex items-center gap-2 px-4 py-2 rounded-md border border-black bg-white text-black text-sm hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200"
@@ -737,6 +745,67 @@ export default function EditProductPage() {
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       Leave empty to use base price
                     </p>
+                  </div>
+                </div>
+
+                {/* Shipping Dimensions */}
+                <div className="mt-4 pt-4 border-t border-neutral-700">
+                  <p className="text-sm font-medium text-gray-400 mb-3">
+                    Shipping Dimensions (for accurate shipping rates)
+                  </p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Length (cm)
+                      </label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        {...register(`variants.${index}.length`)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-neutral-800 text-gray-900 dark:text-white"
+                        placeholder="30"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Width (cm)
+                      </label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        {...register(`variants.${index}.width`)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-neutral-800 text-gray-900 dark:text-white"
+                        placeholder="25"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Height (cm)
+                      </label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        {...register(`variants.${index}.height`)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-neutral-800 text-gray-900 dark:text-white"
+                        placeholder="15"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Weight (kg)
+                      </label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        {...register(`variants.${index}.weight`)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-neutral-800 text-gray-900 dark:text-white"
+                        placeholder="0.5"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

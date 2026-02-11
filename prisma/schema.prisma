@@ -1,17 +1,229 @@
-// // This is your Prisma schema file,
-// // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 // generator client {
-//   provider = "prisma-client"
-//   output   = "../lib/generated/prisma"
+//   provider = "prisma-client-js"
 // }
 
 // datasource db {
-//   provider = "postgresql"
+//   provider = "mongodb"
+//   url      = env("DATABASE_URL")
 // }
+
+// model Account {
+//   id                String  @id @default(auto()) @map("_id") @db.ObjectId
+//   userId            String  @db.ObjectId
+//   type              String
+//   provider          String
+//   providerAccountId String
+//   refresh_token     String? @db.String
+//   access_token      String? @db.String
+//   expires_at        Int?
+//   token_type        String?
+//   scope             String?
+//   id_token          String? @db.String
+//   session_state     String?
+
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   @@unique([provider, providerAccountId])
+// }
+
+// model Session {
+//   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+//   sessionToken String   @unique
+//   userId       String   @db.ObjectId
+//   expires      DateTime
+//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
+
+// model User {
+//   id            String    @id @default(auto()) @map("_id") @db.ObjectId
+//   name          String?
+//   email         String   @unique
+//   emailVerified DateTime?
+//   image         String?
+//   password      String?
+//   role          Role      @default(CUSTOMER)
+//   accounts      Account[]
+//   sessions      Session[]
+//   orders        Order[]
+//   wishlist      Wishlist?
+//   createdAt     DateTime  @default(now())
+//   updatedAt     DateTime  @updatedAt
+// }
+
+// model VerificationToken {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   identifier String
+//   token      String   @unique
+//   expires    DateTime
+
+//   @@unique([identifier, token])
+// }
+
+// model Category {
+//   id          String    @id @default(auto()) @map("_id") @db.ObjectId
+//   name        String    @unique
+//   slug        String    @unique
+//   description String?
+//   image       String?
+//   products    Product[]
+//   createdAt   DateTime  @default(now())
+//   updatedAt   DateTime  @updatedAt
+// }
+
+// model Product {
+//   id          String         @id @default(auto()) @map("_id") @db.ObjectId
+//   name        String
+//   slug        String         @unique
+//   description String
+//   price       Float
+//   comparePrice Float?
+//   images      String[]
+//   variants     ProductVariant[]
+//   categoryId  String         @db.ObjectId
+//   category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   featured    Boolean        @default(false)
+//   isActive    Boolean        @default(true)
+//   orderItems  OrderItem[]
+//   aboutItems     String[]               @default([])
+//   specifications ProductSpecification[] 
+//   createdAt   DateTime       @default(now())
+//   updatedAt   DateTime       @updatedAt
+
+//   @@index([categoryId])
+// }
+
+// model ProductVariant {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//   productId String   @db.ObjectId
+//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   color     String?
+//   size      String?
+//   sku       String   @unique
+//   stock     Int      @default(0)
+//   price     Float?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([productId])
+// }
+
+// model Order {
+//   id              String      @id @default(auto()) @map("_id") @db.ObjectId
+//   orderNumber     String      @unique
+//   userId          String      @db.ObjectId
+//   user            User        @relation(fields: [userId], references: [id])
+//   items           OrderItem[]
+//   totalAmount     Float
+//   status          OrderStatus @default(PENDING)
+//   paymentStatus   PaymentStatus @default(PENDING)
+//   klarnaOrderId   String?
+//   shippingAddress Json
+//   // Billing address (same structure)
+// // Billing Address (Canadian Format)
+//   billingFirstName    String
+//   billingLastName     String
+//   billingStreet       String
+//   billingApartment    String?
+//   billingCity         String
+//   billingProvince     String    // 2-letter province code
+//   billingPostalCode   String    // Canadian postal code
+//   billingCountry      String    @default("CA")
+
+//   billingAddress  Json
+//   customerEmail   String
+//   customerPhone   String?
+//   notes           String?
+//   createdAt       DateTime    @default(now())
+//   updatedAt       DateTime    @updatedAt
+
+//   // Contact
+// email           String
+// phone           String?
+
+// // Structured Canadian addresses
+// shippingFirstName   String
+// shippingLastName    String
+// shippingStreet      String
+// shippingApartment   String?
+// shippingCity        String
+// shippingProvince    String    // ON, BC, AB, etc.
+// shippingPostalCode  String    // A1A 1A1 format
+// shippingCountry     String    @default("CA")
+
+
+// // Pricing breakdown
+// subtotal        Float
+// shippingCost    Float
+// tax             Float
+// total           Float
+
+// // Shipping
+// shippingMethod  String
+
+// // UniUni Integration
+// uniUniOrderNumber String?
+// trackingNumber    String?
+
+// // Stripe
+// stripePaymentId   String?
+
+
+//   @@index([userId])
+// }
+
+// model OrderItem {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   orderId   String  @db.ObjectId
+//   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+//   productId String  @db.ObjectId
+//   product   Product @relation(fields: [productId], references: [id])
+//   quantity  Int
+//   price     Float
+//   name      String
+//   image     String?
+
+//   @@index([orderId])
+//   @@index([productId])
+// }
+
+// model Wishlist {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   userId     String   @unique @db.ObjectId
+//   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   productIds String[] @db.ObjectId
+
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+// }
+
+// type ProductSpecification {
+//   key   String
+//   value String
+// }
+
+// enum Role {
+//   CUSTOMER
+//   ADMIN
+// }
+
+// enum OrderStatus {
+//   PENDING
+//   PROCESSING
+//   SHIPPED
+//   DELIVERED
+//   CANCELLED
+// }
+
+// enum PaymentStatus {
+//   PENDING
+//   AUTHORIZED
+//   CAPTURED
+//   FAILED
+//   REFUNDED
+// }
+
 
 
 
@@ -54,7 +266,7 @@ model Session {
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
-  email         String   @unique
+  email         String    @unique
   emailVerified DateTime?
   image         String?
   password      String?
@@ -88,23 +300,23 @@ model Category {
 }
 
 model Product {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  slug        String         @unique
-  description String
-  price       Float
-  comparePrice Float?
-  images      String[]
-  variants     ProductVariant[]
-  categoryId  String         @db.ObjectId
-  category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  featured    Boolean        @default(false)
-  isActive    Boolean        @default(true)
-  orderItems  OrderItem[]
-  aboutItems     String[]               @default([])
-  specifications ProductSpecification[] 
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id             String                   @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  slug           String                   @unique
+  description    String
+  price          Float
+  comparePrice   Float?
+  images         String[]
+  variants       ProductVariant[]
+  categoryId     String                   @db.ObjectId
+  category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  featured       Boolean                  @default(false)
+  isActive       Boolean                  @default(true)
+  orderItems     OrderItem[]
+  aboutItems     String[]                 @default([])
+  specifications ProductSpecification[]
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
 
   @@index([categoryId])
 }
@@ -118,6 +330,10 @@ model ProductVariant {
   sku       String   @unique
   stock     Int      @default(0)
   price     Float?
+  length    Float?
+  width     Float?
+  height    Float?
+  weight    Float?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -125,24 +341,69 @@ model ProductVariant {
 }
 
 model Order {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  orderNumber     String      @unique
-  userId          String      @db.ObjectId
-  user            User        @relation(fields: [userId], references: [id])
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber     String        @unique
+  userId          String        @db.ObjectId
+  user            User          @relation(fields: [userId], references: [id])
   items           OrderItem[]
   totalAmount     Float
-  status          OrderStatus @default(PENDING)
+  status          OrderStatus   @default(PENDING)
   paymentStatus   PaymentStatus @default(PENDING)
-  klarnaOrderId   String?
-  shippingAddress Json
-  billingAddress  Json
-  customerEmail   String
+
+  // Customer contact
+  email           String
+  phone           String?
+  customerEmail   String?
   customerPhone   String?
-  notes           String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+
+  // Shipping address (Canada)
+  shippingFirstName   String
+  shippingLastName    String
+  shippingStreet      String
+  shippingApartment   String?
+  shippingCity        String
+  shippingProvince    String
+  shippingPostalCode  String
+  shippingCountry     String    @default("CA")
+
+  // Billing address (Canada)
+  billingFirstName    String
+  billingLastName     String
+  billingStreet       String
+  billingApartment    String?
+  billingCity         String
+  billingProvince     String
+  billingPostalCode   String
+  billingCountry      String    @default("CA")
+
+  // Legacy fields
+  shippingAddress Json?
+  billingAddress  Json?
+
+  // Pricing
+  subtotal        Float
+  shippingCost    Float
+  tax             Float
+  total           Float
+
+  // Shipping
+  shippingMethod  String
+
+  // UniUni
+  uniUniOrderNumber String?
+  trackingNumber    String?
+
+  // Payments
+  klarnaOrderId     String?
+  stripePaymentId   String?
+
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([userId])
+  @@index([uniUniOrderNumber])
+  @@index([trackingNumber])
 }
 
 model OrderItem {
@@ -156,6 +417,10 @@ model OrderItem {
   name      String
   image     String?
 
+  variantId String?
+  color     String?
+  size      String?
+
   @@index([orderId])
   @@index([productId])
 }
@@ -164,9 +429,7 @@ model Wishlist {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   userId     String   @unique @db.ObjectId
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   productIds String[] @db.ObjectId
-
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

@@ -45,12 +45,49 @@ export default async function ProductPage({ params }: PageProps) {
       sku: variant.sku,
       stock: variant.stock,
       price: variant.price,
+      length: variant.length,
+      width: variant.width,
+      height: variant.height,
+      weight: variant.weight,
     })),
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
   };
 
-  return <ProductClient product={formattedProduct} />;
+  // Fetch related products
+  const relatedProducts = await prisma.product.findMany({
+    where: {
+      categoryId: product.categoryId,
+      id: { not: product.id },
+    },
+    take: 8,
+    include: {
+      category: true,
+      variants: true,
+    },
+  });
+
+  // Format related products for ProductCard
+  const formattedRelatedProducts = relatedProducts.map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    price: p.price,
+    comparePrice: p.comparePrice,
+    images: p.images,
+    category: {
+      name: p.category.name,
+    },
+    variants: p.variants.map((v) => ({
+      id: v.id,
+      color: v.color,
+      size: v.size,
+      stock: v.stock,
+      price: v.price,
+    })),
+  }));
+
+  return <ProductClient product={formattedProduct} relatedProducts={formattedRelatedProducts} />;
 }
 
 // Generate metadata for SEO

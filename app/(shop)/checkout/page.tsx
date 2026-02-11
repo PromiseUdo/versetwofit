@@ -1,4 +1,5 @@
-// src/app/checkout/page.tsx
+
+// src/app/checkout/page.tsx (UPDATED FOR CANADA)
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,6 +18,7 @@ import {
   MapPin,
   Truck,
   AlertCircle,
+  Info,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { loadStripe } from '@stripe/stripe-js';
@@ -24,14 +26,18 @@ import axios from 'axios';
 import {
   formatCurrency,
   calculateOrderTotal,
-  validateUSAddress,
+  calculateOrderTotalWithDynamicRate,
+  validateCanadianAddress,
   SHIPPING_METHODS,
-  US_STATES,
-  ShippingMethod,
+  CANADIAN_PROVINCES,
+  formatPostalCode,
+  type ShippingMethod,
+  type DynamicShippingRate,
 } from '@/lib/shipping';
+import MaxWidthWrapper from '@/components/max-width-wrapper';
 
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
 );
 
 type CheckoutStep = 'shipping' | 'payment';
@@ -48,8 +54,9 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('shipping');
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationComplete, setValidationComplete] = useState(false);
+  const [loadingRates, setLoadingRates] = useState(false);
 
-  // Shipping Information
+  // Shipping Information (CANADIAN FORMAT)
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
@@ -58,23 +65,44 @@ export default function CheckoutPage() {
     street: '',
     apartment: '',
     city: '',
-    state: '',
-    zipCode: '',
+    province: '', // Changed from 'state'
+    postalCode: '', // Canadian postal code format
   });
 
   const [selectedShippingMethod, setSelectedShippingMethod] =
     useState<ShippingMethod>(SHIPPING_METHODS[0]);
 
+  // Shipping rate fetched from UniUni (only after "Continue to Payment")
+  const [fetchedShippingRate, setFetchedShippingRate] = useState<DynamicShippingRate | null>(null);
+
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const subtotal = getTotalPrice();
-  const totals = calculateOrderTotal(
-    subtotal,
-    selectedShippingMethod.id,
-    shippingInfo.state || 'CA'
-  );
+  
+  // Calculate totals - only include actual shipping on payment step when we have fetched rate
+  const totals = fetchedShippingRate
+    ? calculateOrderTotalWithDynamicRate(
+        subtotal,
+        fetchedShippingRate,
+        shippingInfo.province || 'ON',
+      )
+    : calculateOrderTotal(
+        subtotal,
+        selectedShippingMethod.id,
+        shippingInfo.province || 'ON',
+      );
 
+  // Normalize totals to have consistent shape (tax is totalTax or tax depending on source)
+  const normalizedTotals = {
+    subtotal: totals.subtotal,
+    shipping: fetchedShippingRate ? totals.shipping : 0, // Only show shipping after rate is fetched
+    tax: 'totalTax' in totals ? totals.totalTax : totals.tax,
+    total: fetchedShippingRate ? totals.total : subtotal, // Pre-shipping total
+    shippingPending: !fetchedShippingRate, // Flag to show pending status
+  };
+
+  console.log('Current step:', currentStep, 'Fetched rate:', fetchedShippingRate);
   // Redirect if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -140,6 +168,7 @@ export default function CheckoutPage() {
     ) {
       newErrors.email = 'Valid email is required';
     }
+    // Canadian phone format (10 digits)
     if (
       !shippingInfo.phone.trim() ||
       !/^\d{10}$/.test(shippingInfo.phone.replace(/\D/g, ''))
@@ -147,19 +176,19 @@ export default function CheckoutPage() {
       newErrors.phone = 'Valid 10-digit phone number is required';
     }
 
-    const addressValidation = validateUSAddress({
+    const addressValidation = validateCanadianAddress({
       street: shippingInfo.street,
       city: shippingInfo.city,
-      state: shippingInfo.state,
-      zipCode: shippingInfo.zipCode,
+      province: shippingInfo.province,
+      postalCode: shippingInfo.postalCode,
     });
 
     if (!addressValidation.isValid) {
       addressValidation.errors.forEach((error) => {
         if (error.includes('Street')) newErrors.street = error;
         if (error.includes('City')) newErrors.city = error;
-        if (error.includes('state')) newErrors.state = error;
-        if (error.includes('ZIP')) newErrors.zipCode = error;
+        if (error.includes('province')) newErrors.province = error;
+        if (error.includes('postal')) newErrors.postalCode = error;
       });
     }
 
@@ -167,14 +196,56 @@ export default function CheckoutPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleProceedToPayment = () => {
+  // Create shipment and get rate when proceeding to payment
+  const handleProceedToPayment = async () => {
     if (!validateShippingForm()) {
       toast.error('Please fill in all required fields correctly');
       return;
     }
 
-    setCurrentStep('payment');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setLoadingRates(true);
+    
+    try {
+      // Create single shipment to get the actual rate
+      const response = await axios.post('/api/shipping/create-quote', {
+        address: {
+          street: shippingInfo.street,
+          apartment: shippingInfo.apartment,
+          city: shippingInfo.city,
+          province: shippingInfo.province,
+          postalCode: shippingInfo.postalCode,
+        },
+        items: items.map((item) => ({
+          productName: item.productName,
+          quantity: item.quantity,
+          price: item.price,
+          variantSku: item.variantSku,
+          variantId: item.id,
+        })),
+        recipient: {
+          name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+          email: shippingInfo.email,
+          phone: shippingInfo.phone,
+        },
+        postageType: selectedShippingMethod.id === 'standard' ? 'STANDARD' 
+          : selectedShippingMethod.id === 'next_day' ? 'NEXT DAY' 
+          : 'SAME DAY',
+      });
+
+      if (response.data.success && response.data.rate) {
+        setFetchedShippingRate(response.data.rate);
+        toast.success('Shipping rate calculated');
+        setCurrentStep('payment');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error('Failed to get shipping rate');
+      }
+    } catch (error: any) {
+      console.error('Error creating shipping quote:', error);
+      toast.error(error.response?.data?.message || 'Could not calculate shipping rate. Please try again.');
+    } finally {
+      setLoadingRates(false);
+    }
   };
 
   const handleCreatePaymentIntent = async () => {
@@ -195,12 +266,14 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Create payment intent
+      // Create payment intent (includes UniUni shipment creation)
       const response = await axios.post('/api/checkout/create-payment-intent', {
         items: items.map((item) => ({
           variantId: item.id,
           quantity: item.quantity,
           price: item.price,
+          productName: item.productName,
+          variantSku: item.variantSku,
         })),
         shippingAddress: {
           firstName: shippingInfo.firstName,
@@ -208,45 +281,40 @@ export default function CheckoutPage() {
           street: shippingInfo.street,
           apartment: shippingInfo.apartment,
           city: shippingInfo.city,
-          state: shippingInfo.state,
-          zipCode: shippingInfo.zipCode,
+          state: shippingInfo.province, // API expects 'state' but it's actually province
+          zipCode: shippingInfo.postalCode, // API expects 'zipCode'
         },
         billingAddress: billingSameAsShipping
           ? {
-              firstName: shippingInfo.firstName,
-              lastName: shippingInfo.lastName,
-              street: shippingInfo.street,
-              apartment: shippingInfo.apartment,
-              city: shippingInfo.city,
-              state: shippingInfo.state,
-              zipCode: shippingInfo.zipCode,
-            }
+            firstName: shippingInfo.firstName,
+            lastName: shippingInfo.lastName,
+            street: shippingInfo.street,
+            apartment: shippingInfo.apartment,
+            city: shippingInfo.city,
+            state: shippingInfo.province,
+            zipCode: shippingInfo.postalCode,
+          }
           : null,
         email: shippingInfo.email,
         phone: shippingInfo.phone,
-        shippingMethodId: selectedShippingMethod.id,
-        totals: totals,
+        shippingMethodId: fetchedShippingRate?.postageType || selectedShippingMethod.id,
+        selectedRate: fetchedShippingRate, // Pass the fetched rate for order reuse
+        totals: normalizedTotals,
       });
 
       const { clientSecret, orderId } = response.data;
-
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Stripe failed to load');
-      }
 
       // Store order ID for confirmation page
       sessionStorage.setItem('pendingOrderId', orderId);
 
       // Redirect to payment page with client secret
       router.push(
-        `/checkout/payment?client_secret=${clientSecret}&order_id=${orderId}`
+        `/checkout/payment?client_secret=${clientSecret}&order_id=${orderId}`,
       );
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
       toast.error(
-        error.response?.data?.error || 'Failed to initialize payment'
+        error.response?.data?.error || 'Failed to initialize payment',
       );
     } finally {
       setIsProcessing(false);
@@ -257,7 +325,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto text-indigo-600 mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary mb-4" />
           <p className="text-gray-600">
             {isValidating ? 'Validating cart...' : 'Loading checkout...'}
           </p>
@@ -267,7 +335,10 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+
+    <>
+     <div className="fixed top-0 left-0 right-0 h-48 bg-linear-to-b from-black/80 via-black/30 to-transparent pointer-events-none z-10" />
+     <MaxWidthWrapper className="my-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -286,11 +357,10 @@ export default function CheckoutPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  currentStep === 'shipping'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-green-500 text-white'
-                }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep === 'shipping'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-primary text-primary-foreground'
+                  }`}
               >
                 {currentStep === 'payment' ? <Check size={20} /> : '1'}
               </div>
@@ -303,18 +373,16 @@ export default function CheckoutPage() {
 
             <div className="flex items-center gap-2">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  currentStep === 'payment'
-                    ? 'bg-indigo-600 text-white'
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${currentStep === 'payment'
+                    ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 2
               </div>
               <span
-                className={`font-medium ${
-                  currentStep === 'payment' ? 'text-gray-900' : 'text-gray-500'
-                }`}
+                className={`font-medium ${currentStep === 'payment' ? 'text-gray-900' : 'text-gray-500'
+                  }`}
               >
                 Payment
               </span>
@@ -331,7 +399,7 @@ export default function CheckoutPage() {
                 {/* Contact Information */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <div className="flex items-center gap-2 mb-6">
-                    <MapPin className="text-indigo-600" size={24} />
+                    <MapPin className="text-primary" size={24} />
                     <h2 className="text-xl font-bold text-gray-900">
                       Contact Information
                     </h2>
@@ -351,11 +419,10 @@ export default function CheckoutPage() {
                             firstName: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-3 border ${
-                          errors.firstName
+                        className={`w-full px-4 py-3 border ${errors.firstName
                             ? 'border-red-500'
                             : 'border-gray-300'
-                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                          } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
                         placeholder="John"
                       />
                       {errors.firstName && (
@@ -378,9 +445,8 @@ export default function CheckoutPage() {
                             lastName: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-3 border ${
-                          errors.lastName ? 'border-red-500' : 'border-gray-300'
-                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                        className={`w-full px-4 py-3 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'
+                          } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
                         placeholder="Doe"
                       />
                       {errors.lastName && (
@@ -403,9 +469,8 @@ export default function CheckoutPage() {
                             email: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-3 border ${
-                          errors.email ? 'border-red-500' : 'border-gray-300'
-                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                        className={`w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                          } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
                         placeholder="john.doe@example.com"
                       />
                       {errors.email && (
@@ -428,9 +493,8 @@ export default function CheckoutPage() {
                             phone: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-3 border ${
-                          errors.phone ? 'border-red-500' : 'border-gray-300'
-                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                        className={`w-full px-4 py-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'
+                          } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
                         placeholder="(555) 123-4567"
                       />
                       {errors.phone && (
@@ -462,9 +526,8 @@ export default function CheckoutPage() {
                             street: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-3 border ${
-                          errors.street ? 'border-red-500' : 'border-gray-300'
-                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                        className={`w-full px-4 py-3 border ${errors.street ? 'border-red-500' : 'border-gray-300'
+                          } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
                         placeholder="123 Main Street"
                       />
                       {errors.street && (
@@ -487,7 +550,7 @@ export default function CheckoutPage() {
                             apartment: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="Apt 4B"
                       />
                     </div>
@@ -506,10 +569,9 @@ export default function CheckoutPage() {
                               city: e.target.value,
                             })
                           }
-                          className={`w-full px-4 py-3 border ${
-                            errors.city ? 'border-red-500' : 'border-gray-300'
-                          } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                          placeholder="New York"
+                          className={`w-full px-4 py-3 border ${errors.city ? 'border-red-500' : 'border-gray-300'
+                            } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                          placeholder="Toronto"
                         />
                         {errors.city && (
                           <p className="text-sm text-red-600 mt-1">
@@ -520,57 +582,67 @@ export default function CheckoutPage() {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          State *
+                          Province *
                         </label>
                         <select
-                          value={shippingInfo.state}
-                          onChange={(e) =>
+                          value={shippingInfo.province}
+                          onChange={(e) => {
                             setShippingInfo({
                               ...shippingInfo,
-                              state: e.target.value,
-                            })
-                          }
-                          className={`w-full px-4 py-3 border ${
-                            errors.state ? 'border-red-500' : 'border-gray-300'
-                          } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                              province: e.target.value,
+                            });
+                          }}
+                          className={`w-full px-4 py-3 border ${errors.province
+                              ? 'border-red-500'
+                              : 'border-gray-300'
+                            } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
                         >
-                          <option value="">Select State</option>
-                          {Object.entries(US_STATES).map(([code, name]) => (
-                            <option key={code} value={code}>
-                              {name}
-                            </option>
-                          ))}
+                          <option value="">Select Province</option>
+                          {Object.entries(CANADIAN_PROVINCES).map(
+                            ([code, name]) => (
+                              <option key={code} value={code}>
+                                {name}
+                              </option>
+                            ),
+                          )}
                         </select>
-                        {errors.state && (
+                        {errors.province && (
                           <p className="text-sm text-red-600 mt-1">
-                            {errors.state}
+                            {errors.province}
                           </p>
                         )}
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          ZIP Code *
+                          Postal Code *
                         </label>
                         <input
                           type="text"
-                          value={shippingInfo.zipCode}
+                          value={shippingInfo.postalCode}
                           onChange={(e) =>
                             setShippingInfo({
                               ...shippingInfo,
-                              zipCode: e.target.value,
+                              postalCode: e.target.value.toUpperCase(),
                             })
                           }
-                          className={`w-full px-4 py-3 border ${
-                            errors.zipCode
+                          onBlur={(e) => {
+                            const formatted = formatPostalCode(e.target.value);
+                            setShippingInfo({
+                              ...shippingInfo,
+                              postalCode: formatted,
+                            });
+                          }}
+                          className={`w-full px-4 py-3 border ${errors.postalCode
                               ? 'border-red-500'
                               : 'border-gray-300'
-                          } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                          placeholder="10001"
+                            } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                          placeholder="A1A 1A1"
+                          maxLength={7}
                         />
-                        {errors.zipCode && (
+                        {errors.postalCode && (
                           <p className="text-sm text-red-600 mt-1">
-                            {errors.zipCode}
+                            {errors.postalCode}
                           </p>
                         )}
                       </div>
@@ -580,22 +652,29 @@ export default function CheckoutPage() {
 
                 {/* Shipping Methods */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Truck className="text-indigo-600" size={24} />
+                  <div className="flex items-center gap-2 mb-4">
+                    <Truck className="text-primary" size={24} />
                     <h3 className="text-lg font-bold text-gray-900">
                       Shipping Method
                     </h3>
+                  </div>
+
+                  {/* Info Alert */}
+                  <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg mb-4">
+                    <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-primary">
+                      Select your preferred shipping method. The exact shipping rate will be calculated when you continue to payment.
+                    </p>
                   </div>
 
                   <div className="space-y-3">
                     {SHIPPING_METHODS.map((method) => (
                       <label
                         key={method.id}
-                        className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition ${
-                          selectedShippingMethod.id === method.id
-                            ? 'border-indigo-600 bg-indigo-50'
+                        className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition ${selectedShippingMethod.id === method.id
+                            ? 'border-primary bg-primary/5'
                             : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-4">
                           <input
@@ -603,7 +682,7 @@ export default function CheckoutPage() {
                             name="shipping"
                             checked={selectedShippingMethod.id === method.id}
                             onChange={() => setSelectedShippingMethod(method)}
-                            className="w-5 h-5 text-indigo-600"
+                            className="w-5 h-5 text-primary accent-primary"
                           />
                           <div>
                             <p className="font-semibold text-gray-900">
@@ -612,18 +691,11 @@ export default function CheckoutPage() {
                             <p className="text-sm text-gray-600">
                               {method.description}
                             </p>
-                            {method.carrier && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                via {method.carrier}
-                              </p>
-                            )}
                           </div>
                         </div>
-                        <p className="font-bold text-gray-900">
-                          {totals.shipping === 0
-                            ? 'FREE'
-                            : formatCurrency(method.price)}
-                        </p>
+                        <span className="text-sm text-gray-500 italic">
+                          Rate calculated at checkout
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -632,14 +704,26 @@ export default function CheckoutPage() {
                 {/* Continue Button */}
                 <button
                   onClick={handleProceedToPayment}
-                  className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                  disabled={loadingRates}
+                  className={`w-full py-4 rounded-lg font-semibold transition-colors ${
+                    loadingRates 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-primary hover:bg-primary/90'
+                  } text-primary-foreground flex items-center justify-center gap-2`}
                 >
-                  Continue to Payment
+                  {loadingRates ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Calculating Shipping Rate...
+                    </>
+                  ) : (
+                    'Continue to Payment'
+                  )}
                 </button>
               </>
             )}
 
-            {/* Payment Step */}
+            {/* Payment Step - Keep existing payment step code */}
             {currentStep === 'payment' && (
               <>
                 {/* Review Information */}
@@ -650,7 +734,7 @@ export default function CheckoutPage() {
                     </h3>
                     <button
                       onClick={() => setCurrentStep('shipping')}
-                      className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                      className="text-primary hover:text-primary/90 text-sm font-medium"
                     >
                       Edit
                     </button>
@@ -678,9 +762,10 @@ export default function CheckoutPage() {
                           `, ${shippingInfo.apartment}`}
                       </p>
                       <p className="text-sm text-gray-600">
-                        {shippingInfo.city}, {shippingInfo.state}{' '}
-                        {shippingInfo.zipCode}
+                        {shippingInfo.city}, {shippingInfo.province}{' '}
+                        {shippingInfo.postalCode}
                       </p>
+                      <p className="text-sm text-gray-600">Canada</p>
                     </div>
 
                     <div>
@@ -696,13 +781,13 @@ export default function CheckoutPage() {
                 {/* Payment Section */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <div className="flex items-center gap-2 mb-6">
-                    <CreditCard className="text-indigo-600" size={24} />
+                    <CreditCard className="text-primary" size={24} />
                     <h3 className="text-lg font-bold text-gray-900">Payment</h3>
                   </div>
 
-                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6 mb-6 border border-indigo-100">
+                  <div className="bg-primary/5 rounded-lg p-6 mb-6 border border-primary/10">
                     <div className="flex items-start gap-3">
-                      <Lock className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                      <Lock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold text-gray-900 mb-1">
                           Secure Payment with Stripe
@@ -718,7 +803,7 @@ export default function CheckoutPage() {
                   <button
                     onClick={handleCreatePaymentIntent}
                     disabled={isProcessing}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isProcessing ? (
                       <>
@@ -753,25 +838,12 @@ export default function CheckoutPage() {
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-3">
-                    {/* <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <Image
-                        src={item.image}
-                        alt={item.productName}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute z-50 -top-2 -right-2 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                        {item.quantity}
-                      </div>
-                    </div> */}
-
                     <div className="relative w-16 h-16 mt-2 bg-gray-100 rounded-lg flex-shrink-0">
-                      {/* No overflow-hidden here anymore */}
                       <Image
                         src={item.image}
                         alt={item.productName}
                         fill
-                        className="object-cover rounded-lg" // ← move rounded corners here
+                        className="object-cover rounded-lg"
                       />
                       <div className="absolute z-50 -top-2 -right-2 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-sm">
                         {item.quantity}
@@ -800,37 +872,50 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
                   <span className="font-semibold">
-                    {formatCurrency(totals.subtotal)}
+                    {formatCurrency(normalizedTotals.subtotal)}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping</span>
-                  <span className="font-semibold">
-                    {totals.shipping === 0
-                      ? 'FREE'
-                      : formatCurrency(totals.shipping)}
-                  </span>
+                  {normalizedTotals.shippingPending ? (
+                    <span className="text-sm italic text-gray-500">
+                      Calculated at next step
+                    </span>
+                  ) : (
+                    <span className="font-semibold">
+                      {formatCurrency(normalizedTotals.shipping)}
+                    </span>
+                  )}
                 </div>
 
-                {shippingInfo.state && (
+                {shippingInfo.province && !normalizedTotals.shippingPending && (
                   <div className="flex justify-between text-gray-700">
-                    <span>Tax ({shippingInfo.state})</span>
+                    <span>Tax ({shippingInfo.province})</span>
                     <span className="font-semibold">
-                      {formatCurrency(totals.tax)}
+                      {formatCurrency(normalizedTotals.tax)}
                     </span>
                   </div>
                 )}
 
                 <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-900">
                   <span>Total</span>
-                  <span>{formatCurrency(totals.total)}</span>
+                  {normalizedTotals.shippingPending ? (
+                    <div className="text-right">
+                      <span>{formatCurrency(normalizedTotals.subtotal)}</span>
+                      <p className="text-xs font-normal text-gray-500">+ shipping</p>
+                    </div>
+                  ) : (
+                    <span>{formatCurrency(normalizedTotals.total)}</span>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </MaxWidthWrapper>
+    </>
+   
   );
 }

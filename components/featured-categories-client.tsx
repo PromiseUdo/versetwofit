@@ -94,7 +94,7 @@ export function CategoryCarouselClient({
           key={`${category.id}-${idx}`}
           className="flex-none w-64 border-none px-3"
         >
-          <Link href={`/categories/${category.slug}`}>
+          <Link href={`/category/${category.slug}`}>
             <motion.div
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.4, ease: 'easeOut' }}

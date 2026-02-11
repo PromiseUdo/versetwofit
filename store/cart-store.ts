@@ -14,6 +14,11 @@ export interface CartItem {
   quantity: number;
   image: string;
   stock: number;
+  // Shipping dimensions
+  length: number | null;
+  width: number | null;
+  height: number | null;
+  weight: number | null;
 }
 
 interface CartStore {
@@ -40,12 +45,12 @@ export const useCartStore = create<CartStore>()(
             // Update quantity if item already exists
             const newQuantity = Math.min(
               existingItem.quantity + item.quantity,
-              item.stock
+              item.stock,
             );
 
             return {
               items: state.items.map((i) =>
-                i.id === item.id ? { ...i, quantity: newQuantity } : i
+                i.id === item.id ? { ...i, quantity: newQuantity } : i,
               ),
             };
           }
@@ -81,7 +86,7 @@ export const useCartStore = create<CartStore>()(
 
           return {
             items: state.items.map((i) =>
-              i.id === variantId ? { ...i, quantity: validQuantity } : i
+              i.id === variantId ? { ...i, quantity: validQuantity } : i,
             ),
           };
         });
@@ -98,7 +103,7 @@ export const useCartStore = create<CartStore>()(
       getTotalPrice: () => {
         return get().items.reduce(
           (total, item) => total + item.price * item.quantity,
-          0
+          0,
         );
       },
 
@@ -109,6 +114,6 @@ export const useCartStore = create<CartStore>()(
     {
       name: 'cart-storage',
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

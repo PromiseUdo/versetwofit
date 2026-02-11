@@ -14,16 +14,17 @@ import {
   ChevronRight,
   Filter,
   Calendar,
-  DollarSign,
   Truck,
   CheckCircle,
   XCircle,
   Clock,
   Box,
+  ArrowRight,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '@/lib/shipping';
 import MaxWidthWrapper from '@/components/max-width-wrapper';
+import { cn } from '@/lib/utils';
 
 interface OrderItem {
   id: string;
@@ -48,33 +49,28 @@ interface Order {
 const STATUS_CONFIG = {
   PENDING: {
     label: 'Pending',
-    color: 'bg-yellow-100 text-yellow-800',
+    color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
     icon: Clock,
-    description: 'Order is being processed',
   },
   PROCESSING: {
     label: 'Processing',
-    color: 'bg-blue-100 text-blue-800',
+    color: 'bg-blue-50 text-blue-700 border-blue-200',
     icon: Box,
-    description: 'Preparing your items',
   },
   SHIPPED: {
     label: 'Shipped',
-    color: 'bg-purple-100 text-purple-800',
+    color: 'bg-purple-50 text-purple-700 border-purple-200',
     icon: Truck,
-    description: 'On the way to you',
   },
   DELIVERED: {
     label: 'Delivered',
-    color: 'bg-green-100 text-green-800',
+    color: 'bg-green-50 text-green-700 border-green-200',
     icon: CheckCircle,
-    description: 'Successfully delivered',
   },
   CANCELLED: {
     label: 'Cancelled',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-50 text-red-700 border-red-200',
     icon: XCircle,
-    description: 'Order cancelled',
   },
 };
 
@@ -131,7 +127,7 @@ export default function OrdersPage() {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
     });
   };
@@ -140,8 +136,8 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto text-indigo-600 mb-4" />
-          <p className="text-gray-600">Loading your orders...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary mb-4" />
+          <p className="text-sm text-gray-500">Loading orders...</p>
         </div>
       </div>
     );
@@ -151,190 +147,153 @@ export default function OrdersPage() {
     <>
       <div className="fixed top-0 left-0 right-0 h-48 bg-linear-to-b from-black/80 via-black/30 to-transparent pointer-events-none z-10" />
 
-      <div className="min-h-screen  my-24">
-        <MaxWidthWrapper className="">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Orders</h1>
-            <p className="text-gray-600">Track and manage your orders</p>
-          </div>
-
-          {/* Filters */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter size={20} className="text-gray-600" />
-              <h2 className="font-semibold text-gray-900">Filter Orders</h2>
+      <div className="min-h-screen my-24">
+        <MaxWidthWrapper>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
+              <p className="text-sm text-gray-500">Manage your purchase history</p>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: 'all', label: 'All Orders' },
-                { value: 'pending', label: 'Pending' },
-                { value: 'processing', label: 'Processing' },
-                { value: 'shipped', label: 'Shipped' },
-                { value: 'delivered', label: 'Delivered' },
-                { value: 'cancelled', label: 'Cancelled' },
-              ].map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => {
-                    setSelectedStatus(filter.value);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
-                    selectedStatus === filter.value
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
+            
+            {/* Compact Filters */}
+            <div className="flex overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="flex bg-gray-100 p-1 rounded-lg">
+                {[
+                  { value: 'all', label: 'All' },
+                  { value: 'active', label: 'Active', statusGroup: ['pending', 'processing', 'shipped'] },
+                  { value: 'delivered', label: 'Completed' },
+                  { value: 'cancelled', label: 'Cancelled' },
+                ].map((filter) => {
+                   // Simplified filter logic for display purposes, mapping back to API status
+                   // in a real app you might want to adjust the API to handle groups or keep simple status
+                   // For now, sticking to simple status mapping or 'all'
+                   // Let's stick to the granular statuses but present them cleaner if needed.
+                   // Actually, let's keep the user's specific status request from the plan but simplify visuals.
+                   return null;
+                })}
+                 {[
+                  { value: 'all', label: 'All' },
+                  { value: 'pending', label: 'Pending' },
+                  { value: 'processing', label: 'Processing' },
+                  { value: 'shipped', label: 'Shipped' },
+                  { value: 'delivered', label: 'Delivered' },
+                ].map((filter) => (
+                  <button
+                    key={filter.value}
+                    onClick={() => {
+                        setSelectedStatus(filter.value);
+                        setCurrentPage(1);
+                    }}
+                    className={cn(
+                      'px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap',
+                      selectedStatus === filter.value
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-900'
+                    )}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Orders List */}
           {loading ? (
-            <div className="text-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600 mb-4" />
-              <p className="text-gray-600">Loading orders...</p>
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-24 bg-gray-50 rounded-lg animate-pulse" />
+              ))}
             </div>
           ) : orders.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-              <ShoppingBag className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No orders found
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {selectedStatus === 'all'
-                  ? "You haven't placed any orders yet"
-                  : `No ${selectedStatus} orders found`}
-              </p>
+            <div className="text-center py-16 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+              <ShoppingBag className="w-8 h-8 mx-auto text-gray-300 mb-3" />
+              <p className="text-gray-900 font-medium mb-1">No orders found</p>
+              <p className="text-xs text-gray-500 mb-4">You haven't placed any orders with this status.</p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className="inline-flex items-center text-sm font-medium text-primary hover:underline"
               >
-                Start Shopping
-                <ChevronRight size={18} />
+                Start Shopping <ArrowRight size={14} className="ml-1" />
               </Link>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {orders.map((order) => {
                 const statusConfig = getStatusConfig(order.status);
                 const StatusIcon = statusConfig.icon;
 
                 return (
-                  <div
+                  <Link
                     key={order.id}
-                    className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                    href={`/orders/${order.id}`}
+                    className="group block bg-white border border-gray-100 rounded-lg p-4 hover:border-primary/30 hover:shadow-sm transition-all duration-200"
                   >
-                    {/* Order Header */}
-                    <div className="p-6 border-b bg-gray-50">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-bold text-gray-900 text-lg">
-                              Order #{order.orderNumber}
-                            </h3>
-                            <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${statusConfig.color}`}
-                            >
-                              <StatusIcon size={14} />
-                              {statusConfig.label}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                            <div className="flex items-center gap-1.5">
-                              <Calendar size={16} />
-                              <span>{formatDate(order.createdAt)}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <Package size={16} />
-                              <span>
-                                {order.itemCount} item
-                                {order.itemCount !== 1 ? 's' : ''}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <DollarSign size={16} />
-                              <span className="font-semibold text-gray-900">
-                                {formatCurrency(order.totalAmount)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Link
-                          href={`/orders/${order.id}`}
-                          className="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-sm"
-                        >
-                          View Details
-                          <ChevronRight size={18} />
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Order Items Preview */}
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {order.items.slice(0, 4).map((item) => (
-                          <Link
-                            key={item.id}
-                            href={`/products/${item.productSlug}`}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition group"
+                    <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
+                      
+                      {/* Left: Essential Info */}
+                      <div className="flex-shrink-0 min-w-[140px]">
+                         <div className="flex items-center gap-2 mb-1">
+                            <span className="font-mono text-sm font-semibold text-gray-900">#{order.orderNumber}</span>
+                         </div>
+                         <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                             <Calendar size={12} />
+                             {formatDate(order.createdAt)}
+                         </div>
+                         <span
+                            className={cn(
+                              'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border',
+                              statusConfig.color
+                            )}
                           >
-                            <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                              {item.image ? (
-                                <Image
-                                  src={item.image}
-                                  alt={item.name}
-                                  fill
-                                  className="object-cover group-hover:scale-105 transition"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Package className="w-8 h-8 text-gray-400" />
+                            <StatusIcon size={10} />
+                            {statusConfig.label}
+                          </span>
+                      </div>
+
+                      {/* Middle: Product Thumbnails */}
+                      <div className="flex-1 min-w-0">
+                         <div className="flex items-center gap-2">
+                            {order.items.slice(0, 4).map((item) => (
+                                <div key={item.id} className="relative w-10 h-10 bg-gray-50 rounded border border-gray-100 overflow-hidden flex-shrink-0">
+                                    {item.image ? (
+                                        <Image 
+                                            src={item.image} 
+                                            alt={item.name} 
+                                            fill 
+                                            className="object-cover" 
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <Package size={14} className="text-gray-300"/>
+                                        </div>
+                                    )}
                                 </div>
-                              )}
-                              <div className="absolute -top-1 -right-1 w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                                {item.quantity}
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-indigo-600 transition">
-                                {item.name}
-                              </p>
-                            </div>
-                          </Link>
-                        ))}
-
-                        {order.items.length > 4 && (
-                          <Link
-                            href={`/orders/${order.id}`}
-                            className="flex items-center justify-center p-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-indigo-600 hover:bg-indigo-50 transition group"
-                          >
-                            <div className="text-center">
-                              <p className="text-sm font-medium text-gray-600 group-hover:text-indigo-600">
-                                +{order.items.length - 4} more
-                              </p>
-                              <p className="text-xs text-gray-500 group-hover:text-indigo-500">
-                                View all items
-                              </p>
-                            </div>
-                          </Link>
-                        )}
+                            ))}
+                            {order.items.length > 4 && (
+                                <div className="w-10 h-10 rounded border border-gray-100 bg-gray-50 flex items-center justify-center text-xs font-medium text-gray-500">
+                                    +{order.items.length - 4}
+                                </div>
+                            )}
+                         </div>
+                         <p className="text-xs text-gray-500 mt-1.5 truncate">
+                            {order.items.map(i => i.name).join(', ')}
+                         </p>
                       </div>
-                    </div>
 
-                    {/* Status Description */}
-                    <div className="px-6 pb-6">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-                        <StatusIcon size={16} className="flex-shrink-0" />
-                        <p>{statusConfig.description}</p>
+                      {/* Right: Total & Action */}
+                      <div className="flex items-center justify-between sm:justify-end gap-6 sm:min-w-[120px]">
+                         <div className="text-right">
+                             <p className="text-xs text-gray-500">Total</p>
+                             <p className="text-sm font-bold text-gray-900">{formatCurrency(order.totalAmount)}</p>
+                         </div>
+                         <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-primary group-hover:text-white transition-colors">
+                            <ChevronRight size={16} />
+                         </div>
                       </div>
+
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -344,48 +303,27 @@ export default function OrdersPage() {
           {!loading && totalPages > 1 && (
             <div className="mt-8 flex items-center justify-center gap-2">
               <button
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage((prev) => Math.max(1, prev - 1));
+                }}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="p-2 bg-white border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Previous
+                <ChevronRight size={16} className="rotate-180" />
               </button>
-
-              <div className="flex items-center gap-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter(
-                    (page) =>
-                      page === 1 ||
-                      page === totalPages ||
-                      Math.abs(page - currentPage) <= 1
-                  )
-                  .map((page, index, array) => (
-                    <div key={page} className="flex items-center gap-2">
-                      {index > 0 && array[index - 1] !== page - 1 && (
-                        <span className="text-gray-500">...</span>
-                      )}
-                      <button
-                        onClick={() => setCurrentPage(page)}
-                        className={`w-10 h-10 rounded-lg font-medium transition ${
-                          currentPage === page
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    </div>
-                  ))}
-              </div>
-
+              <span className="text-xs font-medium text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
               <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                }
+                onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                }}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="p-2 bg-white border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                <ChevronRight size={16} />
               </button>
             </div>
           )}

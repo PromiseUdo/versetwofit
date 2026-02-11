@@ -3,12 +3,57 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TextHoverEffect } from './ui/text-hover-effect';
+import Link from 'next/link';
 
-const HeroSlider = () => {
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface HeroSliderProps {
+  categories?: Category[];
+}
+
+const HeroSlider = ({ categories = [] }: HeroSliderProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const slides = [
+
+     {
+      id: 3,
+      image: '/hero3.jpg',
+      content: (
+        <div className="flex flex-col items-center justify-center h-full px-8">
+          <div className="h-80 flex items-center justify-center">
+            <TextHoverEffect text="Vrse. Two" />
+          </div>
+          <ul className="flex flex-col items-center max-w-3xl mx-auto mt-8 gap-y-2 gap-x-4 lg:flex-row lg:justify-center">
+            {categories.map((category, index) => (
+              <React.Fragment key={category.id}>
+                {index > 0 && (
+                  <li className="hidden lg:block text-white/40">•</li>
+                )}
+                <li>
+                  <Link
+                    href={`/category/${category.slug}`}
+                    className="font-medium uppercase text-white hover:text-zinc-300 transition-colors text-sm tracking-wider"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              </React.Fragment>
+            ))}
+          </ul>
+          <h2 className="mt-24 font-semibold uppercase text-white lg:mt-32 text-center max-w-3xl mx-auto text-lg md:text-xl tracking-wide">
+           
+            Curated pieces for every mood, every moment, and every version of you.
+          </h2>
+        </div>
+      ),
+    },
+
     {
       id: 1,
       image: '/hero1.jpg',
@@ -16,12 +61,12 @@ const HeroSlider = () => {
         <div className="relative mx-auto max-w-screen-xl grid lg:px-8">
           <div className="px-8 pt-[35rem] pb-12 z-50 lg:px-0 lg:pt-[35rem] flex flex-col justify-end text-white">
             <p className="text-lg md:text-xl max-w-xl mt-4 font-semibold text-balance">
-              Collaborate in real time and launch ideas faster than ever before.
+            New season. New energy.
             </p>
             <h2 className="text-5xl md:text-7xl font-black tracking-tight text-zinc-100 mt-4">
-              Instant teamwork
+              Define Your
               <br />
-              Limitless results
+Style
             </h2>
           </div>
         </div>
@@ -34,64 +79,13 @@ const HeroSlider = () => {
         <div className="mx-auto max-w-screen-xl grid">
           <div className="z-50 flex flex-col justify-end items-center px-8 text-center py-96 lg:px-0 lg:py-96">
             <h2 className="text-6xl md:text-8xl font-black tracking-tight text-zinc-100">
-              Transforming
+             Made to Be Seen
             </h2>
           </div>
         </div>
       ),
     },
-    {
-      id: 3,
-      image: '/hero3.jpg',
-      content: (
-        <div className="flex flex-col items-center justify-center h-full px-8">
-          <div className="h-80 flex items-center justify-center">
-            <TextHoverEffect text="Vrse. Two" />
-          </div>
-          <ul className="flex flex-col items-center max-w-3xl mx-auto mt-8 gap-y-2 gap-x-4 lg:flex-row lg:justify-center">
-            <li>
-              <a
-                href="#_"
-                className="font-medium uppercase text-white hover:text-zinc-300 transition-colors text-sm tracking-wider"
-              >
-                Women
-              </a>
-            </li>
-            <li className="hidden lg:block text-white/40">•</li>
-            <li>
-              <a
-                href="#_"
-                className="font-medium uppercase text-white hover:text-zinc-300 transition-colors text-sm tracking-wider"
-              >
-                Men
-              </a>
-            </li>
-            <li className="hidden lg:block text-white/40">•</li>
-            <li>
-              <a
-                href="#_"
-                className="font-medium uppercase text-white hover:text-zinc-300 transition-colors text-sm tracking-wider"
-              >
-                Children
-              </a>
-            </li>
-            <li className="hidden lg:block text-white/40">•</li>
-            <li>
-              <a
-                href="#_"
-                className="font-medium uppercase text-white hover:text-zinc-300 transition-colors text-sm tracking-wider"
-              >
-                Home
-              </a>
-            </li>
-          </ul>
-          <h2 className="mt-24 font-semibold uppercase text-white lg:mt-32 text-center max-w-3xl mx-auto text-lg md:text-xl tracking-wide">
-            Collaborate, create, and launch your next big idea—no matter the
-            challenge.
-          </h2>
-        </div>
-      ),
-    },
+   
   ];
 
   const nextSlide = () => {

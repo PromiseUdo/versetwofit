@@ -1,6 +1,6 @@
 // app/components/navbar.tsx
 import { NavbarClient } from './navbar-client';
-// import prisma from '@/lib/prismadb';
+import { prisma } from '@/lib/prisma';
 
 interface NavbarProps {
   user: {
@@ -13,5 +13,14 @@ interface NavbarProps {
 }
 
 export default async function Navbar({ user }: NavbarProps) {
-  return <NavbarClient user={user} />;
+  const categories = await prisma.category.findMany({
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+    },
+    orderBy: { name: 'asc' },
+  });
+
+  return <NavbarClient user={user} categories={categories} />;
 }

@@ -1,7 +1,7 @@
+
 // src/lib/shipping.ts
 /**
- * Professional shipping calculation for USA e-commerce
- * Based on industry standards for clothing retailers
+ * Shipping utilities for Canadian e-commerce with UniUni integration
  */
 
 export type ShippingMethod = {
@@ -13,48 +13,39 @@ export type ShippingMethod = {
   carrier?: string;
 };
 
+// These will be dynamically populated from UniUni API
 export const SHIPPING_METHODS: ShippingMethod[] = [
   {
     id: 'standard',
     name: 'Standard Shipping',
     description: 'Delivery in 5-7 business days',
-    price: 5.99,
-    estimatedDays: '5-7 business days',
-    carrier: 'USPS',
-  },
-  {
-    id: 'express',
-    name: 'Express Shipping',
-    description: 'Delivery in 2-3 business days',
     price: 12.99,
-    estimatedDays: '2-3 business days',
-    carrier: 'FedEx',
+    estimatedDays: '5-7 business days',
+    carrier: 'UniUni',
   },
   {
-    id: 'overnight',
-    name: 'Overnight Shipping',
-    description: 'Next business day delivery',
+    id: 'next_day',
+    name: 'Next Day Shipping',
+    description: 'Delivery in 1 business day',
     price: 24.99,
-    estimatedDays: 'Next business day',
-    carrier: 'FedEx Express',
+    estimatedDays: '1 business day',
+    carrier: 'UniUni',
+  },
+  {
+    id: 'same_day',
+    name: 'Same Day Shipping',
+    description: 'Same day delivery',
+    price: 39.99,
+    estimatedDays: 'Same day',
+    carrier: 'UniUni',
   },
 ];
 
-export const FREE_SHIPPING_THRESHOLD = 75; // Free shipping over $75
-
 /**
- * Calculate shipping cost based on cart subtotal and selected method
+ * Calculate shipping cost based on selected method
+ * FREE SHIPPING REMOVED - All shipments now have a cost
  */
-export function calculateShipping(
-  subtotal: number,
-  shippingMethodId: string
-): number {
-  // Free shipping for orders over threshold
-  if (subtotal >= FREE_SHIPPING_THRESHOLD) {
-    return 0;
-  }
-
-  // Find selected shipping method
+export function calculateShipping(shippingMethodId: string): number {
   const method = SHIPPING_METHODS.find((m) => m.id === shippingMethodId);
 
   if (!method) {
@@ -66,85 +57,48 @@ export function calculateShipping(
 }
 
 /**
- * Check if order qualifies for free shipping
+ * Calculate sales tax for Canadian provinces
+ * GST/HST/PST rates as of 2024
  */
-export function qualifiesForFreeShipping(subtotal: number): boolean {
-  return subtotal >= FREE_SHIPPING_THRESHOLD;
-}
-
-/**
- * Calculate how much more needed for free shipping
- */
-export function amountUntilFreeShipping(subtotal: number): number {
-  if (qualifiesForFreeShipping(subtotal)) {
-    return 0;
+export const PROVINCE_TAX_RATES: Record<
+  string,
+  {
+    gst: number;
+    pst: number;
+    hst: number;
+    total: number;
+    name: string;
   }
-  return FREE_SHIPPING_THRESHOLD - subtotal;
-}
-
-/**
- * Calculate sales tax for USA states
- * Note: In production, use a tax API like TaxJar or Avalara
- */
-export const STATE_TAX_RATES: Record<string, number> = {
-  AL: 0.04, // Alabama
-  AK: 0.0, // Alaska
-  AZ: 0.056, // Arizona
-  AR: 0.065, // Arkansas
-  CA: 0.0725, // California
-  CO: 0.029, // Colorado
-  CT: 0.0635, // Connecticut
-  DE: 0.0, // Delaware
-  FL: 0.06, // Florida
-  GA: 0.04, // Georgia
-  HI: 0.04, // Hawaii
-  ID: 0.06, // Idaho
-  IL: 0.0625, // Illinois
-  IN: 0.07, // Indiana
-  IA: 0.06, // Iowa
-  KS: 0.065, // Kansas
-  KY: 0.06, // Kentucky
-  LA: 0.0445, // Louisiana
-  ME: 0.055, // Maine
-  MD: 0.06, // Maryland
-  MA: 0.0625, // Massachusetts
-  MI: 0.06, // Michigan
-  MN: 0.06875, // Minnesota
-  MS: 0.07, // Mississippi
-  MO: 0.04225, // Missouri
-  MT: 0.0, // Montana
-  NE: 0.055, // Nebraska
-  NV: 0.0685, // Nevada
-  NH: 0.0, // New Hampshire
-  NJ: 0.06625, // New Jersey
-  NM: 0.05125, // New Mexico
-  NY: 0.04, // New York
-  NC: 0.0475, // North Carolina
-  ND: 0.05, // North Dakota
-  OH: 0.0575, // Ohio
-  OK: 0.045, // Oklahoma
-  OR: 0.0, // Oregon
-  PA: 0.06, // Pennsylvania
-  RI: 0.07, // Rhode Island
-  SC: 0.06, // South Carolina
-  SD: 0.045, // South Dakota
-  TN: 0.07, // Tennessee
-  TX: 0.0625, // Texas
-  UT: 0.0485, // Utah
-  VT: 0.06, // Vermont
-  VA: 0.053, // Virginia
-  WA: 0.065, // Washington
-  WV: 0.06, // West Virginia
-  WI: 0.05, // Wisconsin
-  WY: 0.04, // Wyoming
+> = {
+  AB: { gst: 0.05, pst: 0, hst: 0, total: 0.05, name: 'Alberta' },
+  BC: { gst: 0.05, pst: 0.07, hst: 0, total: 0.12, name: 'British Columbia' },
+  MB: { gst: 0.05, pst: 0.07, hst: 0, total: 0.12, name: 'Manitoba' },
+  NB: { gst: 0, pst: 0, hst: 0.15, total: 0.15, name: 'New Brunswick' },
+  NL: {
+    gst: 0,
+    pst: 0,
+    hst: 0.15,
+    total: 0.15,
+    name: 'Newfoundland and Labrador',
+  },
+  NT: { gst: 0.05, pst: 0, hst: 0, total: 0.05, name: 'Northwest Territories' },
+  NS: { gst: 0, pst: 0, hst: 0.15, total: 0.15, name: 'Nova Scotia' },
+  NU: { gst: 0.05, pst: 0, hst: 0, total: 0.05, name: 'Nunavut' },
+  ON: { gst: 0, pst: 0, hst: 0.13, total: 0.13, name: 'Ontario' },
+  PE: { gst: 0, pst: 0, hst: 0.15, total: 0.15, name: 'Prince Edward Island' },
+  QC: { gst: 0.05, pst: 0.09975, hst: 0, total: 0.14975, name: 'Quebec' },
+  SK: { gst: 0.05, pst: 0.06, hst: 0, total: 0.11, name: 'Saskatchewan' },
+  YT: { gst: 0.05, pst: 0, hst: 0, total: 0.05, name: 'Yukon' },
 };
 
 /**
- * Calculate sales tax based on state
+ * Calculate sales tax based on province
  */
-export function calculateTax(subtotal: number, stateCode: string): number {
-  const taxRate = STATE_TAX_RATES[stateCode.toUpperCase()] || 0;
-  return subtotal * taxRate;
+export function calculateTax(subtotal: number, provinceCode: string): number {
+  const taxInfo = PROVINCE_TAX_RATES[provinceCode.toUpperCase()];
+  if (!taxInfo) return 0;
+
+  return subtotal * taxInfo.total;
 }
 
 /**
@@ -153,16 +107,16 @@ export function calculateTax(subtotal: number, stateCode: string): number {
 export function calculateOrderTotal(
   subtotal: number,
   shippingMethodId: string,
-  stateCode: string
+  provinceCode: string,
 ): {
   subtotal: number;
   shipping: number;
   tax: number;
   total: number;
 } {
-  const shipping = calculateShipping(subtotal, shippingMethodId);
+  const shipping = calculateShipping(shippingMethodId);
   const taxableAmount = subtotal + shipping;
-  const tax = calculateTax(taxableAmount, stateCode);
+  const tax = calculateTax(taxableAmount, provinceCode);
   const total = taxableAmount + tax;
 
   return {
@@ -174,13 +128,69 @@ export function calculateOrderTotal(
 }
 
 /**
- * Validate USA shipping address
+ * Dynamic shipping rate from UniUni API
  */
-export function validateUSAddress(address: {
+export type DynamicShippingRate = {
+  postageType: string;
+  postageFee: number;
+  tax: number;
+  total: number;
+  currency: string;
+  orderNumber: string | null;
+  estimatedDays: string;
+  name: string;
+  isEstimate?: boolean;
+};
+
+/**
+ * Calculate order totals using dynamic shipping rate from UniUni
+ * Uses actual postageFee and tax from the API response
+ */
+export function calculateOrderTotalWithDynamicRate(
+  subtotal: number,
+  selectedRate: DynamicShippingRate,
+  provinceCode: string,
+): {
+  subtotal: number;
+  shipping: number;
+  shippingTax: number;
+  productTax: number;
+  totalTax: number;
+  total: number;
+} {
+  // Use the rate's postageFee as shipping cost
+  const shipping = selectedRate.postageFee;
+  
+  // The rate's tax is already the shipping tax from UniUni
+  const shippingTax = selectedRate.tax;
+  
+  // Calculate tax on products based on province
+  const productTax = calculateTax(subtotal, provinceCode);
+  
+  // Total tax = product tax + shipping tax
+  const totalTax = productTax + shippingTax;
+  
+  // Total = subtotal + shipping + total tax
+  const total = subtotal + shipping + totalTax;
+
+  return {
+    subtotal,
+    shipping,
+    shippingTax,
+    productTax,
+    totalTax,
+    total,
+  };
+}
+
+/**
+ * Validate Canadian shipping address
+ */
+export function validateCanadianAddress(address: {
   street: string;
   city: string;
-  state: string;
-  zipCode: string;
+  province: string;
+  postalCode: string;
 }): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
@@ -192,14 +202,17 @@ export function validateUSAddress(address: {
     errors.push('City is required');
   }
 
-  if (!address.state || !STATE_TAX_RATES[address.state.toUpperCase()]) {
-    errors.push('Valid US state is required');
+  if (
+    !address.province ||
+    !PROVINCE_TAX_RATES[address.province.toUpperCase()]
+  ) {
+    errors.push('Valid Canadian province is required');
   }
 
-  // Validate ZIP code (5 digits or 5+4 format)
-  const zipRegex = /^\d{5}(-\d{4})?$/;
-  if (!address.zipCode || !zipRegex.test(address.zipCode)) {
-    errors.push('Valid ZIP code is required (e.g., 12345 or 12345-6789)');
+  // Validate Canadian postal code (A1A 1A1 format)
+  const postalRegex = /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i;
+  if (!address.postalCode || !postalRegex.test(address.postalCode.trim())) {
+    errors.push('Valid Canadian postal code is required (e.g., A1A 1A1)');
   }
 
   return {
@@ -209,67 +222,59 @@ export function validateUSAddress(address: {
 }
 
 /**
- * Format currency for display
+ * Format currency for display (Canadian dollars)
  */
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-CA', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'CAD',
   }).format(amount);
 }
 
 /**
- * Get state name from code
+ * Get province name from code
  */
-export const US_STATES: Record<string, string> = {
-  AL: 'Alabama',
-  AK: 'Alaska',
-  AZ: 'Arizona',
-  AR: 'Arkansas',
-  CA: 'California',
-  CO: 'Colorado',
-  CT: 'Connecticut',
-  DE: 'Delaware',
-  FL: 'Florida',
-  GA: 'Georgia',
-  HI: 'Hawaii',
-  ID: 'Idaho',
-  IL: 'Illinois',
-  IN: 'Indiana',
-  IA: 'Iowa',
-  KS: 'Kansas',
-  KY: 'Kentucky',
-  LA: 'Louisiana',
-  ME: 'Maine',
-  MD: 'Maryland',
-  MA: 'Massachusetts',
-  MI: 'Michigan',
-  MN: 'Minnesota',
-  MS: 'Mississippi',
-  MO: 'Missouri',
-  MT: 'Montana',
-  NE: 'Nebraska',
-  NV: 'Nevada',
-  NH: 'New Hampshire',
-  NJ: 'New Jersey',
-  NM: 'New Mexico',
-  NY: 'New York',
-  NC: 'North Carolina',
-  ND: 'North Dakota',
-  OH: 'Ohio',
-  OK: 'Oklahoma',
-  OR: 'Oregon',
-  PA: 'Pennsylvania',
-  RI: 'Rhode Island',
-  SC: 'South Carolina',
-  SD: 'South Dakota',
-  TN: 'Tennessee',
-  TX: 'Texas',
-  UT: 'Utah',
-  VT: 'Vermont',
-  VA: 'Virginia',
-  WA: 'Washington',
-  WV: 'West Virginia',
-  WI: 'Wisconsin',
-  WY: 'Wyoming',
+export const CANADIAN_PROVINCES: Record<string, string> = {
+  AB: 'Alberta',
+  BC: 'British Columbia',
+  MB: 'Manitoba',
+  NB: 'New Brunswick',
+  NL: 'Newfoundland and Labrador',
+  NT: 'Northwest Territories',
+  NS: 'Nova Scotia',
+  NU: 'Nunavut',
+  ON: 'Ontario',
+  PE: 'Prince Edward Island',
+  QC: 'Quebec',
+  SK: 'Saskatchewan',
+  YT: 'Yukon',
 };
+
+/**
+ * Format Canadian postal code
+ */
+export function formatPostalCode(postalCode: string): string {
+  const cleaned = postalCode.replace(/\s/g, '').toUpperCase();
+  if (cleaned.length === 6) {
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+  }
+  return postalCode;
+}
+
+/**
+ * Map shipping method ID to UniUni postage type
+ * NOTE: UniUni uses spaces, not underscores (e.g., "SAME DAY" not "SAME_DAY")
+ */
+export function getUniUniPostageType(
+  shippingMethodId: string,
+): 'STANDARD' | 'NEXT DAY' | 'SAME DAY' {
+  switch (shippingMethodId) {
+    case 'same_day':
+      return 'SAME DAY';
+    case 'next_day':
+      return 'NEXT DAY';
+    case 'standard':
+    default:
+      return 'STANDARD';
+  }
+}

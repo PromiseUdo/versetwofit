@@ -28,6 +28,11 @@ export const productSchema = z.object({
         sku: z.string().min(1, 'SKU is required'),
         stock: z.string().min(1, 'Stock is required'),
         price: z.string().optional(),
+        // Shipping dimensions (for UniUni)
+        length: z.string().optional(), // cm
+        width: z.string().optional(),  // cm
+        height: z.string().optional(), // cm
+        weight: z.string().optional(), // kg
       })
     )
     .min(1, 'At least one variant is required'),

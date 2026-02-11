@@ -35,7 +35,7 @@ function PaymentPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto text-indigo-600 mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary mb-4" />
           <p className="text-gray-600">Initializing payment...</p>
         </div>
       </div>
@@ -45,7 +45,7 @@ function PaymentPageContent() {
   const appearance = {
     theme: 'stripe' as const,
     variables: {
-      colorPrimary: '#4f46e5',
+      colorPrimary: '#303d32',
       colorBackground: '#ffffff',
       colorText: '#1f2937',
       colorDanger: '#ef4444',
@@ -76,7 +76,7 @@ export default function PaymentPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
         </div>
       }
     >
