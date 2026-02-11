@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma'; // adjust path if needed
-import { OrderStatus } from '@prisma/client';
+
 
 /**
  * GET /api/admin/orders
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const page = Number(searchParams.get('page') ?? 1);
     const limit = Number(searchParams.get('limit') ?? 20);
     const search = searchParams.get('search') ?? '';
-    const status = searchParams.get('status') as OrderStatus | null;
+    const status = searchParams.get('status');
 
     const skip = (page - 1) * limit;
 

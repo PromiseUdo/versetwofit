@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { OrderStatus } from '@prisma/client';
+
 
 type RouteContext = {
   params: Promise<{
@@ -63,7 +63,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   try {
     const { id } = await params;
     const body = await request.json();
-    const { status } = body as { status: OrderStatus };
+    const { status } = body as { status: string };
 
     if (!status) {
       return NextResponse.json(
@@ -74,7 +74,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
     const updated = await prisma.order.update({
       where: { id },
-      data: { status },
+      data: { status: status as any },
     });
 
     return NextResponse.json(updated);
