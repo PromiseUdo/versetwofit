@@ -1,7 +1,7 @@
 import { ProductCard } from "@/components/product-card";
 import { prisma } from "@/lib/prisma";
 import { Pagination } from "@/app/(shop)/products/components/pagination";
-import { Prisma } from "@prisma/client";
+import { Product, ProductVariant } from "@prisma/client";
 
 interface CategoryProductsContentProps {
   categoryId: string;
@@ -10,14 +10,12 @@ interface CategoryProductsContentProps {
   page: number;
 }
 
-type ProductWithRelations = Prisma.ProductGetPayload<{
-  include: {
-    category: {
-      select: { name: true };
-    };
-    variants: true;
+type ProductWithRelations = Product & {
+  category: {
+    name: string;
   };
-}>;
+  variants: ProductVariant[];
+};
 
 export async function CategoryProductsContent({
   categoryId,
