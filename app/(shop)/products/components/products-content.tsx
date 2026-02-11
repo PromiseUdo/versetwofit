@@ -1,11 +1,11 @@
 // src/components/products-content.tsx
 // ============================================
-import { ProductCard } from '@/components/product-card';
-import { prisma } from '@/lib/prisma';
-import { Pagination } from './pagination';
+import { ProductCard } from "@/components/product-card";
+import { prisma } from "@/lib/prisma";
+import { Pagination } from "./pagination";
 
 interface ProductsContentProps {
-  filterType?: 'new-arrivals' | 'featured';
+  filterType?: "new-arrivals" | "featured";
   categorySlug?: string;
   sortBy: string;
   page: number;
@@ -25,7 +25,7 @@ export async function ProductsContent({
     isActive: true,
   };
 
-  if (filterType === 'featured') {
+  if (filterType === "featured") {
     where.featured = true;
   }
 
@@ -39,16 +39,16 @@ export async function ProductsContent({
   }
 
   // Build orderBy clause
-  let orderBy: any = { createdAt: 'desc' }; // Default: newest first
+  let orderBy: any = { createdAt: "desc" }; // Default: newest first
 
-  if (filterType === 'new-arrivals') {
-    orderBy = { createdAt: 'desc' };
-  } else if (sortBy === 'price-asc') {
-    orderBy = { price: 'asc' };
-  } else if (sortBy === 'price-desc') {
-    orderBy = { price: 'desc' };
-  } else if (sortBy === 'name') {
-    orderBy = { name: 'asc' };
+  if (filterType === "new-arrivals") {
+    orderBy = { createdAt: "desc" };
+  } else if (sortBy === "price-asc") {
+    orderBy = { price: "asc" };
+  } else if (sortBy === "price-desc") {
+    orderBy = { price: "desc" };
+  } else if (sortBy === "name") {
+    orderBy = { name: "asc" };
   }
 
   // Fetch products
@@ -60,7 +60,7 @@ export async function ProductsContent({
           select: { name: true },
         },
         variants: {
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: "asc" },
         },
       },
       orderBy,
@@ -85,7 +85,7 @@ export async function ProductsContent({
   return (
     <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-8">
-        {products.map((product) => (
+        {products.map((product: any) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
