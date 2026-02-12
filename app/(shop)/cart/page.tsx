@@ -352,13 +352,13 @@
 // }
 
 // src/app/cart/page.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/store/cart-store';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCartStore } from "@/store/cart-store";
+import Image from "next/image";
+import Link from "next/link";
 import {
   Trash2,
   Plus,
@@ -368,10 +368,10 @@ import {
   Tag,
   Lock,
   Truck,
-} from 'lucide-react';
-import toast from 'react-hot-toast';
-import { formatCurrency } from '@/lib/shipping';
-import MaxWidthWrapper from '@/components/max-width-wrapper';
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { formatCurrency } from "@/lib/shipping";
+import MaxWidthWrapper from "@/components/max-width-wrapper";
 
 export default function CartPage() {
   const router = useRouter();
@@ -435,13 +435,13 @@ export default function CartPage() {
   return (
     <>
       <div className="fixed top-0 left-0 right-0 h-48 bg-linear-to-b from-black/80 via-black/30 to-transparent pointer-events-none z-10" />
-      <div className="min-h-screen bg-gray-50 my-24">
+      <div className="min-h-screen  my-24">
         <MaxWidthWrapper className="">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
             <p className="text-gray-600 mt-2">
-              {totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart
+              {totalItems} {totalItems === 1 ? "item" : "items"} in your cart
             </p>
           </div>
 
@@ -613,7 +613,7 @@ export default function CartPage() {
 
                 {/* Checkout Button */}
                 <button
-                  onClick={() => router.push('/checkout')}
+                  onClick={() => router.push("/checkout")}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 mb-4"
                 >
                   Proceed to Checkout

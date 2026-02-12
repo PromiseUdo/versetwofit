@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import Image from 'next/image';
-import MaxWidthWrapper from '@/components/max-width-wrapper';
+import { useState, useRef } from "react";
+import Image from "next/image";
+import MaxWidthWrapper from "@/components/max-width-wrapper";
 import {
   IconBrandFacebook,
   IconBrandTwitter,
@@ -14,15 +14,15 @@ import {
   IconShoppingCart,
   IconPackage,
   IconLock,
-} from '@tabler/icons-react';
-import { DirectionAwareHover } from '@/components/ui/direction-aware-hover';
-import toast from 'react-hot-toast';
-import { useCartStore } from '@/store/cart-store';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import axios from 'axios';
-import { ProductCard } from '@/components/product-card';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+} from "@tabler/icons-react";
+import { DirectionAwareHover } from "@/components/ui/direction-aware-hover";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/store/cart-store";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import axios from "axios";
+import { ProductCard } from "@/components/product-card";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 type ProductVariant = {
   id: string;
@@ -95,30 +95,30 @@ export default function ProductClient({
 
   const [activeImage, setActiveImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants[0] || null
+    product.variants[0] || null,
   );
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Extract unique colors and sizes from variants
   const availableColors = Array.from(
-    new Set(product.variants.map((v) => v.color).filter(Boolean))
+    new Set(product.variants.map((v) => v.color).filter(Boolean)),
   );
   const availableSizes = Array.from(
-    new Set(product.variants.map((v) => v.size).filter(Boolean))
+    new Set(product.variants.map((v) => v.size).filter(Boolean)),
   );
 
   const [selectedColor, setSelectedColor] = useState<string | null>(
-    availableColors[0] || null
+    availableColors[0] || null,
   );
   const [selectedSize, setSelectedSize] = useState<string | null>(
-    availableSizes[0] || null
+    availableSizes[0] || null,
   );
 
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
     const variant = product.variants.find(
-      (v) => v.color === color && v.size === selectedSize
+      (v) => v.color === color && v.size === selectedSize,
     );
     if (variant) setSelectedVariant(variant);
   };
@@ -126,7 +126,7 @@ export default function ProductClient({
   const handleSizeChange = (size: string) => {
     setSelectedSize(size);
     const variant = product.variants.find(
-      (v) => v.color === selectedColor && v.size === size
+      (v) => v.color === selectedColor && v.size === size,
     );
     if (variant) setSelectedVariant(variant);
   };
@@ -143,12 +143,12 @@ export default function ProductClient({
 
   const handleAddToCart = async () => {
     if (!selectedVariant) {
-      toast.error('Please select a variant');
+      toast.error("Please select a variant");
       return;
     }
 
     if (selectedVariant.stock === 0) {
-      toast.error('This product is out of stock');
+      toast.error("This product is out of stock");
       return;
     }
 
@@ -170,7 +170,7 @@ export default function ProductClient({
         size: selectedVariant.size,
         price: finalPrice,
         quantity: quantity,
-        image: product.images[0] || '/placeholder.jpg',
+        image: product.images[0] || "/placeholder.jpg",
         stock: selectedVariant.stock,
         length: selectedVariant.length,
         width: selectedVariant.width,
@@ -180,22 +180,22 @@ export default function ProductClient({
 
       const variantDesc = [selectedVariant.color, selectedVariant.size]
         .filter(Boolean)
-        .join(', ');
+        .join(", ");
 
       toast.success(
         <div className="flex flex-col gap-1">
           <p className="font-semibold">Added to cart!</p>
           <p className="text-sm text-gray-600">
-            {product.name} {variantDesc ? `(${variantDesc})` : ''} x {quantity}
+            {product.name} {variantDesc ? `(${variantDesc})` : ""} x {quantity}
           </p>
         </div>,
-        { duration: 3000 }
+        { duration: 3000 },
       );
 
       setQuantity(1);
     } catch (error) {
-      console.error('Add to cart error:', error);
-      toast.error('Failed to add item to cart');
+      console.error("Add to cart error:", error);
+      toast.error("Failed to add item to cart");
     } finally {
       setIsAddingToCart(false);
     }
@@ -203,43 +203,43 @@ export default function ProductClient({
 
   const handleBuyNow = async () => {
     if (!selectedVariant) {
-      toast.error('Please select a variant');
+      toast.error("Please select a variant");
       return;
     }
 
     if (selectedVariant.stock === 0) {
-      toast.error('This product is out of stock');
+      toast.error("This product is out of stock");
       return;
     }
 
     await handleAddToCart();
-    router.push('/checkout');
+    router.push("/checkout");
   };
 
   const handleAddToWishlist = async () => {
     if (!session) {
-      router.push('/login');
-      toast.error('Please sign in to add to wishlist');
+      router.push("/login");
+      toast.error("Please sign in to add to wishlist");
       return;
     }
 
     try {
-      await axios.post('/api/wishlist', { productId: product.id });
-      toast.success('Added to wishlist!');
+      await axios.post("/api/wishlist", { productId: product.id });
+      toast.success("Added to wishlist!");
     } catch (error: any) {
       if (error.response?.status === 409) {
-        toast.error('Already in wishlist');
+        toast.error("Already in wishlist");
       } else {
-        toast.error(error.response?.data?.error || 'Failed to add to wishlist');
+        toast.error(error.response?.data?.error || "Failed to add to wishlist");
       }
     }
   };
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
       const { current } = scrollContainerRef;
-      const scrollAmount = direction === 'left' ? -300 : 300;
-      current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const scrollAmount = direction === "left" ? -300 : 300;
+      current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
@@ -253,7 +253,7 @@ export default function ProductClient({
           <div className="flex flex-col lg:sticky lg:top-24 gap-2 h-fit">
             <div className="overflow-hidden aspect-square bg-zinc-100 rounded-2xl relative">
               <DirectionAwareHover
-                imageUrl={product.images[activeImage] || '/placeholder.jpg'}
+                imageUrl={product.images[activeImage] || "/placeholder.jpg"}
                 imageClassName="object-cover"
               >
                 <></>
@@ -267,8 +267,8 @@ export default function ProductClient({
                   onClick={() => setActiveImage(index)}
                   className={`overflow-hidden rounded-xl aspect-square bg-zinc-100 relative border ${
                     activeImage === index
-                      ? 'ring-2 ring-zinc-900'
-                      : 'border-zinc-200'
+                      ? "ring-2 ring-zinc-900"
+                      : "border-zinc-200"
                   }`}
                 >
                   <Image src={image} alt="" fill className="object-cover" />
@@ -287,11 +287,11 @@ export default function ProductClient({
                 <del className="opacity-40">
                   ₦{product.comparePrice?.toLocaleString()}
                 </del>
-              )}{' '}
+              )}{" "}
               ₦{finalPrice.toLocaleString()}
               {hasDiscount && (
                 <span className="text-green-400">
-                  {' '}
+                  {" "}
                   - {discountPercentage}% Off
                 </span>
               )}
@@ -314,8 +314,8 @@ export default function ProductClient({
                         onClick={() => handleColorChange(color!)}
                         className={`px-4 py-2 rounded-md border text-sm font-medium transition-all ${
                           selectedColor === color
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100'
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100"
                         }`}
                       >
                         {color}
@@ -336,8 +336,8 @@ export default function ProductClient({
                         onClick={() => handleSizeChange(size!)}
                         className={`px-3 py-2 rounded-md border text-sm font-medium transition-all ${
                           selectedSize === size
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100'
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100"
                         }`}
                       >
                         {size}
@@ -382,7 +382,7 @@ export default function ProductClient({
                   <button
                     onClick={() =>
                       setQuantity(
-                        Math.min(selectedVariant?.stock || 999, quantity + 1)
+                        Math.min(selectedVariant?.stock || 999, quantity + 1),
                       )
                     }
                     className="p-2 hover:bg-gray-100 transition-colors"
@@ -408,7 +408,7 @@ export default function ProductClient({
                   selectedVariant.stock === 0 ||
                   isAddingToCart
                 }
-                className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
+                className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium "
               >
                 {isAddingToCart ? (
                   <>
@@ -458,8 +458,8 @@ export default function ProductClient({
             {/* Accordions */}
             <div className="mt-8 divide-y divide-zinc-200">
               {[
-                { title: 'Shipping', content: 'Free shipping over ₦50,000.' },
-                { title: 'Returns', content: '30-day return policy.' },
+                { title: "Shipping", content: "Free shipping over ₦50,000." },
+                { title: "Returns", content: "30-day return policy." },
               ].map((section) => (
                 <details key={section.title} className="py-4">
                   <summary className="cursor-pointer font-medium">
@@ -495,19 +495,17 @@ export default function ProductClient({
               </h3>
               <table className="w-full text-sm text-gray-700">
                 <tbody>
-                  {(product.specifications ?? []).map(
-                    (spec, idx) => (
-                      <tr
-                        key={idx}
-                        className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                      >
-                        <td className="py-2 pr-4 text-sm font-medium text-gray-900">
-                          {spec.key}
-                        </td>
-                        <td className="py-2 pl-4 text-sm ">{spec.value}</td>
-                      </tr>
-                    )
-                  )}
+                  {(product.specifications ?? []).map((spec, idx) => (
+                    <tr
+                      key={idx}
+                      className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                    >
+                      <td className="py-2 pr-4 text-sm font-medium text-gray-900">
+                        {spec.key}
+                      </td>
+                      <td className="py-2 pl-4 text-sm ">{spec.value}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -537,18 +535,18 @@ export default function ProductClient({
                 {[
                   {
                     Icon: IconPackage,
-                    title: 'Fast & Secure Shipping',
-                    desc: 'Quick and reliable delivery to your doorstep.',
+                    title: "Fast & Secure Shipping",
+                    desc: "Quick and reliable delivery to your doorstep.",
                   },
                   {
                     Icon: IconHeart,
-                    title: 'Premium Quality Guarantee',
-                    desc: 'We use only the finest materials for our collections.',
+                    title: "Premium Quality Guarantee",
+                    desc: "We use only the finest materials for our collections.",
                   },
                   {
                     Icon: IconLock,
-                    title: '100% Secure Checkout',
-                    desc: 'Your payment information is always protected.',
+                    title: "100% Secure Checkout",
+                    desc: "Your payment information is always protected.",
                   },
                 ].map(({ Icon, title, desc }, idx) => (
                   <div key={idx} className="flex gap-3">
@@ -579,14 +577,14 @@ export default function ProductClient({
               </h2>
               <div className="flex gap-2">
                 <button
-                  onClick={() => scroll('left')}
+                  onClick={() => scroll("left")}
                   className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
                   aria-label="Scroll left"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => scroll('right')}
+                  onClick={() => scroll("right")}
                   className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
                   aria-label="Scroll right"
                 >
@@ -598,7 +596,7 @@ export default function ProductClient({
             <div
               ref={scrollContainerRef}
               className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {relatedProducts.map((relatedProduct) => (
                 <div
