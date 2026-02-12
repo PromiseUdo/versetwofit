@@ -556,7 +556,7 @@ class UniUniClient {
       { type: 'SAME DAY', name: 'Same Day Shipping', estimatedDays: 'Same day' },
     ];
 
-    const rates = [];
+    const rates: any[] = [];
 
     for (const { type, name, estimatedDays } of postageTypes) {
       try {

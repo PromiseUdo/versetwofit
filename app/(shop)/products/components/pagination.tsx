@@ -1,10 +1,10 @@
 // src/components/pagination.tsx
 // ============================================
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   currentPage: number;
@@ -21,11 +21,11 @@ export function Pagination({
 
   const createPageUrl = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
+    params.set("page", page.toString());
     return `${baseUrl}?${params.toString()}`;
   };
 
-  const pages = [];
+  const pages: (number | string)[] = [];
   const showEllipsis = totalPages > 7;
 
   if (showEllipsis) {
@@ -34,7 +34,7 @@ export function Pagination({
 
     // Show ellipsis or pages around current
     if (currentPage > 3) {
-      pages.push('...');
+      pages.push("...");
     }
 
     // Show pages around current
@@ -48,7 +48,7 @@ export function Pagination({
 
     // Show ellipsis or last pages
     if (currentPage < totalPages - 2) {
-      pages.push('...');
+      pages.push("...");
     }
 
     // Show last page
@@ -67,8 +67,8 @@ export function Pagination({
         href={createPageUrl(currentPage - 1)}
         className={`p-2 rounded-lg border transition ${
           currentPage === 1
-            ? 'border-gray-300 text-gray-400 cursor-not-allowed pointer-events-none'
-            : 'border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
+            ? "border-gray-300 text-gray-400 cursor-not-allowed pointer-events-none"
+            : "border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
         }`}
         aria-disabled={currentPage === 1}
       >
@@ -77,7 +77,7 @@ export function Pagination({
 
       {/* Page Numbers */}
       {pages.map((page, idx) =>
-        page === '...' ? (
+        page === "..." ? (
           <span key={`ellipsis-${idx}`} className="px-3 py-2 text-gray-400">
             ...
           </span>
@@ -87,13 +87,13 @@ export function Pagination({
             href={createPageUrl(page as number)}
             className={`px-4 py-2 rounded-lg border transition ${
               currentPage === page
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
+                ? "bg-indigo-600 text-white border-indigo-600"
+                : "border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
             }`}
           >
             {page}
           </Link>
-        )
+        ),
       )}
 
       {/* Next Button */}
@@ -101,8 +101,8 @@ export function Pagination({
         href={createPageUrl(currentPage + 1)}
         className={`p-2 rounded-lg border transition ${
           currentPage === totalPages
-            ? 'border-gray-300 text-gray-400 cursor-not-allowed pointer-events-none'
-            : 'border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
+            ? "border-gray-300 text-gray-400 cursor-not-allowed pointer-events-none"
+            : "border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
         }`}
         aria-disabled={currentPage === totalPages}
       >
