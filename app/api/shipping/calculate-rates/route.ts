@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     console.log('📦 Fetched variant dimensions from DB:', variants);
 
     // Create a lookup map for dimensions
-    const variantDimensionsMap = new Map(
+    const variantDimensionsMap: Map<string, any> = new Map(
       variants.map((v: any) => [v.id, { length: v.length, width: v.width, height: v.height, weight: v.weight }])
     );
 
