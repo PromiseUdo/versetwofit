@@ -87,7 +87,7 @@ export default function RegisterPage() {
 
     try {
       // Register the user
-      const registerResponse = await axios.post("/api/auth/register", {
+      const registerResponse = await axios.post("/api/register", {
         name: formData.name.trim(),
         email: formData.email.toLowerCase(),
         password: formData.password,
