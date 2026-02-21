@@ -65,7 +65,7 @@ export function useCartValidation() {
           toast.success(
             `Price updated for ${
               cartItem.productName
-            }: ₦${validatedItem.currentPrice?.toLocaleString()}`
+            }: $${validatedItem.currentPrice?.toLocaleString()}`
           );
         }
       });

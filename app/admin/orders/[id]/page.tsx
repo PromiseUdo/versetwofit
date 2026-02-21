@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import axios from 'axios';
-import { format } from 'date-fns';
-import toast from 'react-hot-toast';
-import { ArrowLeft, Package, CreditCard, Truck } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import axios from "axios";
+import { format } from "date-fns";
+import toast from "react-hot-toast";
+import { ArrowLeft, Package, CreditCard, Truck } from "lucide-react";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -27,8 +27,8 @@ export default function OrderDetailsPage() {
     } catch (e) {
       console.log(e);
 
-      toast.error('Failed to load order');
-      router.push('/admin/orders');
+      toast.error("Failed to load order");
+      router.push("/admin/orders");
     } finally {
       setIsLoading(false);
     }
@@ -38,10 +38,10 @@ export default function OrderDetailsPage() {
     try {
       setUpdating(true);
       await axios.patch(`/api/admin-order/${id}`, { status });
-      toast.success('Order status updated');
+      toast.success("Order status updated");
       loadOrder();
     } catch {
-      toast.error('Failed to update order');
+      toast.error("Failed to update order");
     } finally {
       setUpdating(false);
     }
@@ -72,7 +72,7 @@ export default function OrderDetailsPage() {
             Order #{order.orderNumber}
           </h1>
           <p className="text-gray-400 mt-1">
-            Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
+            Placed on {format(new Date(order.createdAt), "MMM dd, yyyy")}
           </p>
         </div>
 
@@ -139,16 +139,16 @@ export default function OrderDetailsPage() {
             </h3>
 
             <p className="text-sm text-gray-400">
-              Status:{' '}
+              Status:{" "}
               <span className="font-semibold text-white">
                 {order.paymentStatus}
               </span>
             </p>
 
             <p className="text-sm text-gray-400 mt-2">
-              Total:{' '}
+              Total:{" "}
               <span className="font-semibold text-white">
-                ₦{order.totalAmount.toLocaleString()}
+                ${order.totalAmount.toLocaleString()}
               </span>
             </p>
           </div>

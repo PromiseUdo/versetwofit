@@ -201,11 +201,11 @@
 //             <div className="flex items-center space-x-2">
 //               {product.comparePrice && (
 //                 <span className="text-sm text-gray-400 line-through">
-//                   ₦{product.comparePrice.toLocaleString()}
+//                   ${product.comparePrice.toLocaleString()}
 //                 </span>
 //               )}
 //               <span className="text-lg font-semibold text-gray-50">
-//                 ₦{product.price.toLocaleString()}
+//                 ${product.price.toLocaleString()}
 //               </span>
 //             </div>
 
@@ -245,18 +245,18 @@
 // }
 
 // src/components/product-card.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { Heart, ShoppingCart } from 'lucide-react';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
-import axios from 'axios';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/store/cart-store';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Heart, ShoppingCart } from "lucide-react";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useCartStore } from "@/store/cart-store";
+import { useWishlistStore } from "@/store/wishlist-store";
 
 interface Variant {
   id: string;
@@ -291,15 +291,26 @@ export function ProductCard({ product }: ProductCardProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
+  const { isInWishlist, toggleItem, fetchWishlist, isLoaded } =
+    useWishlistStore();
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const wishlisted = isInWishlist(product.id);
+
+  // Fetch wishlist on mount if logged in and not yet loaded
+  useEffect(() => {
+    if (session && !isLoaded) {
+      fetchWishlist();
+    }
+  }, [session, isLoaded, fetchWishlist]);
 
   // Get images
-  const mainImage = product.images[0] || '/hero1.jpg';
-  const hoverImage = product.images[1] || product.images[0] || '/hero2.jpg';
+  const mainImage = product.images[0] || "/hero1.jpg";
+  const hoverImage = product.images[1] || product.images[0] || "/hero2.jpg";
 
   // Calculate discount
   const discount = product.comparePrice
     ? Math.round(
-        ((product.comparePrice - product.price) / product.comparePrice) * 100
+        ((product.comparePrice - product.price) / product.comparePrice) * 100,
       )
     : 0;
 
@@ -319,7 +330,7 @@ export function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
 
     if (totalStock === 0) {
-      toast.error('Product out of stock');
+      toast.error("Product out of stock");
       return;
     }
 
@@ -327,7 +338,7 @@ export function ProductCard({ product }: ProductCardProps) {
     const availableVariant = product.variants.find((v) => v.stock > 0);
 
     if (!availableVariant) {
-      toast.error('No available variants');
+      toast.error("No available variants");
       return;
     }
 
@@ -340,12 +351,12 @@ export function ProductCard({ product }: ProductCardProps) {
       productId: product.id,
       productName: product.name,
       productSlug: product.slug,
-      variantSku: '',
+      variantSku: "",
       color: availableVariant.color,
       size: availableVariant.size,
       price: itemPrice,
       quantity: 1,
-      image: product.images[0] || '/hero1.jpg',
+      image: product.images[0] || "/hero1.jpg",
       stock: availableVariant.stock,
       length: availableVariant.length ?? null,
       width: availableVariant.width ?? null,
@@ -358,9 +369,9 @@ export function ProductCard({ product }: ProductCardProps) {
         availableVariant.color || availableVariant.size
           ? ` (${[availableVariant.color, availableVariant.size]
               .filter(Boolean)
-              .join(', ')})`
-          : ''
-      }`
+              .join(", ")})`
+          : ""
+      }`,
     );
   };
 
@@ -369,16 +380,23 @@ export function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
 
     if (!session) {
-      router.push('/login');
-      toast.error('Please sign in to add to wishlist');
+      router.push("/login");
+      toast.error("Please sign in to add to wishlist");
       return;
     }
 
+    if (isWishlistLoading) return;
+    setIsWishlistLoading(true);
+
     try {
-      await axios.post('/api/wishlist', { productId: product.id });
-      toast.success('Added to wishlist!');
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to add to wishlist');
+      const action = await toggleItem(product.id);
+      toast.success(
+        action === "added" ? "Added to wishlist!" : "Removed from wishlist",
+      );
+    } catch {
+      toast.error("Failed to update wishlist");
+    } finally {
+      setIsWishlistLoading(false);
     }
   };
 
@@ -387,22 +405,22 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="max-w-xs w-full">
         <div
           className={cn(
-            'group w-full cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl mx-auto flex flex-col justify-end p-4 border border-transparent dark:border-neutral-800',
-            'transition-all duration-500'
+            "group w-full cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl mx-auto flex flex-col justify-end p-4 border border-transparent dark:border-neutral-800",
+            "transition-all duration-500",
           )}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           style={{
             backgroundImage: `url(${isHovered ? hoverImage : mainImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         >
           {/* Hover Overlay */}
           <div
             className={cn(
-              'absolute inset-0 bg-black transition-opacity duration-500',
-              isHovered ? 'opacity-50' : 'opacity-0'
+              "absolute inset-0 bg-black transition-opacity duration-500",
+              isHovered ? "opacity-50" : "opacity-0",
             )}
           />
 
@@ -453,21 +471,33 @@ export function ProductCard({ product }: ProductCardProps) {
                 onClick={handleAddToCart}
                 disabled={totalStock === 0}
                 className={cn(
-                  'px-4 py-2 flex-1 flex items-center gap-2 justify-center rounded-md border border-[#f3f3f3] text-[#f3f3f3] text-sm transition duration-200',
+                  "px-4 py-2 flex-1 flex items-center gap-2 justify-center rounded-md border border-[#f3f3f3] text-[#f3f3f3] text-sm transition duration-200",
                   totalStock > 0
-                    ? 'hover:border-primary hover:bg-[#f3f3f3] hover:text-primary hover:shadow-[4px_4px_0px_0px_var(--color-primary)]'
-                    : 'opacity-50 cursor-not-allowed'
+                    ? "hover:border-primary hover:bg-[#f3f3f3] hover:text-primary hover:shadow-[4px_4px_0px_0px_var(--color-primary)]"
+                    : "opacity-50 cursor-not-allowed",
                 )}
               >
                 <ShoppingCart size={18} />
-                {totalStock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                {totalStock > 0 ? "Add to Cart" : "Out of Stock"}
               </button>
 
               <button
                 onClick={handleAddToWishlist}
-                className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md hover:bg-gray-200 transition-colors dark:border-neutral-700 dark:hover:bg-neutral-800"
+                disabled={isWishlistLoading}
+                className={cn(
+                  "w-10 h-10 flex items-center justify-center rounded-md transition-all duration-200",
+                  wishlisted
+                    ? "bg-red-50 border border-red-200 hover:bg-red-100"
+                    : "border border-gray-300 hover:bg-gray-200 dark:border-neutral-700 dark:hover:bg-neutral-800",
+                )}
               >
-                <Heart size={18} className="text-red-500" />
+                <Heart
+                  size={18}
+                  className={cn(
+                    "transition-colors",
+                    wishlisted ? "text-red-500 fill-red-500" : "text-red-500",
+                  )}
+                />
               </button>
             </motion.div>
           </div>

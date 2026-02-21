@@ -1,12 +1,12 @@
 // src/app/admin/products/[id]/page.tsx
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import toast from "react-hot-toast";
 import {
   Plus,
   X,
@@ -17,14 +17,14 @@ import {
   Save,
   List,
   FileText,
-} from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ProductFormData, productSchema } from '@/schemas/product.schema';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { FileUpload } from '@/components/ui/file-upload';
-import { Button } from '@/components/ui/button';
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { ProductFormData, productSchema } from "@/schemas/product.schema";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { FileUpload } from "@/components/ui/file-upload";
+import { Button } from "@/components/ui/button";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -36,9 +36,9 @@ export default function EditProductPage() {
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImages, setUploadingImages] = useState<number[]>([]);
-  const [currentAboutItem, setCurrentAboutItem] = useState('');
-  const [currentSpecKey, setCurrentSpecKey] = useState('');
-  const [currentSpecValue, setCurrentSpecValue] = useState('');
+  const [currentAboutItem, setCurrentAboutItem] = useState("");
+  const [currentSpecKey, setCurrentSpecKey] = useState("");
+  const [currentSpecValue, setCurrentSpecValue] = useState("");
 
   const {
     register,
@@ -52,7 +52,7 @@ export default function EditProductPage() {
     defaultValues: {
       featured: false,
       images: [],
-      variants: [{ color: '', size: '', sku: '', stock: '0', price: '' }],
+      variants: [{ color: "", size: "", sku: "", stock: "0", price: "" }],
       aboutItems: [],
       specifications: [],
     },
@@ -64,7 +64,7 @@ export default function EditProductPage() {
     remove: removeVariant,
   } = useFieldArray({
     control,
-    name: 'variants',
+    name: "variants",
   });
 
   const {
@@ -73,7 +73,7 @@ export default function EditProductPage() {
     remove: removeAboutItem,
   } = useFieldArray({
     control,
-    name: 'aboutItems',
+    name: "aboutItems",
   });
 
   const {
@@ -82,10 +82,10 @@ export default function EditProductPage() {
     remove: removeSpec,
   } = useFieldArray({
     control,
-    name: 'specifications',
+    name: "specifications",
   });
 
-  const images = watch('images');
+  const images = watch("images");
 
   // Load product data
   useEffect(() => {
@@ -94,31 +94,43 @@ export default function EditProductPage() {
         const response = await axios.get(`/api/admin/products/${id}`);
         const product = response.data;
 
-        setValue('name', product.name);
-        setValue('description', product.description);
-        setValue('price', product.price.toString());
-        setValue('comparePrice', product.comparePrice?.toString() || '');
-        setValue('categoryId', product.categoryId);
-        setValue('featured', product.featured);
-        setValue('images', product.images || []);
+        setValue("name", product.name);
+        setValue("description", product.description);
+        setValue("price", product.price.toString());
+        setValue("comparePrice", product.comparePrice?.toString() || "");
+        setValue("categoryId", product.categoryId);
+        setValue("featured", product.featured);
+        setValue("images", product.images || []);
 
         // Handle variants
         const formattedVariants =
           product.variants?.length > 0
             ? product.variants.map((v: any) => ({
-                color: v.color || '',
-                size: v.size || '',
-                sku: v.sku || '',
-                stock: v.stock?.toString() || '0',
-                price: v.price?.toString() || '',
-                length: v.length?.toString() || '',
-                width: v.width?.toString() || '',
-                height: v.height?.toString() || '',
-                weight: v.weight?.toString() || '',
+                color: v.color || "",
+                size: v.size || "",
+                sku: v.sku || "",
+                stock: v.stock?.toString() || "0",
+                price: v.price?.toString() || "",
+                length: v.length?.toString() || "",
+                width: v.width?.toString() || "",
+                height: v.height?.toString() || "",
+                weight: v.weight?.toString() || "",
               }))
-            : [{ color: '', size: '', sku: '', stock: '0', price: '', length: '', width: '', height: '', weight: '' }];
+            : [
+                {
+                  color: "",
+                  size: "",
+                  sku: "",
+                  stock: "0",
+                  price: "",
+                  length: "",
+                  width: "",
+                  height: "",
+                  weight: "",
+                },
+              ];
 
-        setValue('variants', formattedVariants);
+        setValue("variants", formattedVariants);
 
         // Handle aboutItems
         const formattedAboutItems =
@@ -126,7 +138,7 @@ export default function EditProductPage() {
             ? product.aboutItems.map((item: string) => ({ value: item }))
             : [];
 
-        setValue('aboutItems', formattedAboutItems);
+        setValue("aboutItems", formattedAboutItems);
 
         // Handle specifications
         const formattedSpecs =
@@ -137,10 +149,10 @@ export default function EditProductPage() {
               }))
             : [];
 
-        setValue('specifications', formattedSpecs);
+        setValue("specifications", formattedSpecs);
       } catch (error) {
-        toast.error('Failed to load product');
-        router.push('/admin/products');
+        toast.error("Failed to load product");
+        router.push("/admin/products");
       } finally {
         setIsLoadingProduct(false);
       }
@@ -153,10 +165,10 @@ export default function EditProductPage() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await axios.get("/api/categories");
         setCategories(response.data);
       } catch (error) {
-        toast.error('Failed to load categories');
+        toast.error("Failed to load categories");
       } finally {
         setIsLoadingCategories(false);
       }
@@ -170,24 +182,24 @@ export default function EditProductPage() {
     setUploadingImages(files.map((_, i) => i));
 
     try {
-      const currentImages = watch('images') || [];
+      const currentImages = watch("images") || [];
 
       const uploadedUrls = await Promise.all(
         files.map(async (file) => {
           const formData = new FormData();
-          formData.append('file', file);
+          formData.append("file", file);
 
-          const response = await axios.post('/api/upload', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+          const response = await axios.post("/api/upload", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
           });
           return response.data.imageUrl;
-        })
+        }),
       );
 
-      setValue('images', [...currentImages, ...uploadedUrls]);
+      setValue("images", [...currentImages, ...uploadedUrls]);
       toast.success(`${uploadedUrls.length} image(s) uploaded successfully`);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to upload images');
+      toast.error(error.response?.data?.error || "Failed to upload images");
     } finally {
       setUploadingImages([]);
     }
@@ -195,8 +207,8 @@ export default function EditProductPage() {
 
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
-    setValue('images', newImages);
-    toast.success('Image removed');
+    setValue("images", newImages);
+    toast.success("Image removed");
   };
 
   const generateSKU = (index: number) => {
@@ -208,7 +220,7 @@ export default function EditProductPage() {
   const addAboutItem = () => {
     if (currentAboutItem.trim()) {
       appendAboutItem({ value: currentAboutItem.trim() });
-      setCurrentAboutItem('');
+      setCurrentAboutItem("");
     }
   };
 
@@ -218,8 +230,8 @@ export default function EditProductPage() {
         key: currentSpecKey.trim(),
         value: currentSpecValue.trim(),
       });
-      setCurrentSpecKey('');
-      setCurrentSpecValue('');
+      setCurrentSpecKey("");
+      setCurrentSpecValue("");
     }
   };
 
@@ -228,11 +240,11 @@ export default function EditProductPage() {
 
     try {
       await axios.put(`/api/admin/products/${id}`, data);
-      toast.success('Product updated successfully!');
-      router.push('/admin/products');
+      toast.success("Product updated successfully!");
+      router.push("/admin/products");
     } catch (error: any) {
-      console.error('Update product error:', error);
-      toast.error(error.response?.data?.error || 'Failed to update product');
+      console.error("Update product error:", error);
+      toast.error(error.response?.data?.error || "Failed to update product");
     } finally {
       setIsSubmitting(false);
     }
@@ -285,7 +297,7 @@ export default function EditProductPage() {
               </label>
               <Input
                 type="text"
-                {...register('name')}
+                {...register("name")}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-neutral-700 text-gray-900 dark:text-white"
                 placeholder="e.g., Classic Cotton T-Shirt"
               />
@@ -303,7 +315,7 @@ export default function EditProductPage() {
                 Description *
               </label>
               <Textarea
-                {...register('description')}
+                {...register("description")}
                 rows={4}
                 className="w-full px-4 py-3 border-none dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-neutral-700 text-gray-900 dark:text-white"
                 placeholder="Describe your product in detail..."
@@ -320,13 +332,13 @@ export default function EditProductPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Price (₦) *
+                  Price ($) *
                 </label>
                 <Input
                   type="number"
                   step="0.01"
                   min={0}
-                  {...register('price')}
+                  {...register("price")}
                   className="w-full px-4 py-3 bg-neutral-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
                   placeholder="0.00"
                 />
@@ -340,12 +352,12 @@ export default function EditProductPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Compare at Price (₦)
+                  Compare at Price ($)
                 </label>
                 <Input
                   type="number"
                   step="0.01"
-                  {...register('comparePrice')}
+                  {...register("comparePrice")}
                   className="w-full px-4 py-3 border-none bg-neutral-700 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
                   placeholder="0.00"
                 />
@@ -366,7 +378,7 @@ export default function EditProductPage() {
                 </div>
               ) : (
                 <select
-                  {...register('categoryId')}
+                  {...register("categoryId")}
                   className="w-full px-4 py-3 border-none dark:border-gray-700 rounded-lg focus:ring-0 focus:border-transparent bg-neutral-700 text-gray-900 dark:text-white focus-visible:ring-neutral-400 focus-visible:outline-none"
                 >
                   <option value="">Select a category</option>
@@ -395,7 +407,7 @@ export default function EditProductPage() {
             <div className="flex items-center gap-3">
               <Input
                 type="checkbox"
-                {...register('featured')}
+                {...register("featured")}
                 className="w-5 h-5 text-indigo-600 focus-visible:ring-neutral-400 focus-visible:outline-none border-gray-300 dark:border-gray-700 rounded focus:ring-2 focus:ring-indigo-500"
               />
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -500,7 +512,7 @@ export default function EditProductPage() {
                 value={currentAboutItem}
                 onChange={(e) => setCurrentAboutItem(e.target.value)}
                 onKeyPress={(e) =>
-                  e.key === 'Enter' && (e.preventDefault(), addAboutItem())
+                  e.key === "Enter" && (e.preventDefault(), addAboutItem())
                 }
                 className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-neutral-700 text-gray-900 w-96 dark:text-white"
                 placeholder="e.g., Made from 100% organic cotton"
@@ -566,7 +578,7 @@ export default function EditProductPage() {
                 value={currentSpecValue}
                 onChange={(e) => setCurrentSpecValue(e.target.value)}
                 onKeyPress={(e) =>
-                  e.key === 'Enter' && (e.preventDefault(), addSpecification())
+                  e.key === "Enter" && (e.preventDefault(), addSpecification())
                 }
                 className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-neutral-700 text-gray-900 dark:text-white"
                 placeholder="Value (e.g., 100% Cotton)"
@@ -624,15 +636,15 @@ export default function EditProductPage() {
               type="button"
               onClick={() =>
                 appendVariant({
-                  color: '',
-                  size: '',
-                  sku: '',
-                  stock: '0',
-                  price: '',
-                  length: '',
-                  width: '',
-                  height: '',
-                  weight: '',
+                  color: "",
+                  size: "",
+                  sku: "",
+                  stock: "0",
+                  price: "",
+                  length: "",
+                  width: "",
+                  height: "",
+                  weight: "",
                 })
               }
               className="flex items-center gap-2 px-4 py-2 rounded-md border border-black bg-white text-black text-sm hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200"
@@ -733,7 +745,7 @@ export default function EditProductPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Price (₦)
+                      Price ($)
                     </label>
                     <Input
                       type="number"

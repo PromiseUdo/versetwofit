@@ -1,11 +1,11 @@
 // src/app/admin/products/page.tsx
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import axios from 'axios';
-import { format } from 'date-fns';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import axios from "axios";
+import { format } from "date-fns";
 import {
   Plus,
   Search,
@@ -18,16 +18,16 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
-} from 'lucide-react';
-import toast from 'react-hot-toast';
-import { Input } from '@/components/ui/input';
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { Input } from "@/components/ui/input";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -45,7 +45,7 @@ export default function ProductsPage() {
       setIsLoading(true);
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '20',
+        limit: "20",
         ...(search && { search }),
         ...(categoryFilter && { categoryId: categoryFilter }),
       });
@@ -55,7 +55,7 @@ export default function ProductsPage() {
       setTotalPages(response.data.pagination.totalPages);
       setTotal(response.data.pagination.total);
     } catch (error) {
-      toast.error('Failed to load products');
+      toast.error("Failed to load products");
     } finally {
       setIsLoading(false);
     }
@@ -63,10 +63,10 @@ export default function ProductsPage() {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('/api/categories');
+      const response = await axios.get("/api/categories");
       setCategories(response.data);
     } catch (error) {
-      console.error('Failed to load categories');
+      console.error("Failed to load categories");
     }
   };
 
@@ -82,23 +82,23 @@ export default function ProductsPage() {
 
   const toggleProductStatus = async (
     productId: string,
-    currentStatus: boolean
+    currentStatus: boolean,
   ) => {
     try {
-      await axios.put(`/api/admin/products/${productId}`, {
+      await axios.patch(`/api/admin/products/${productId}`, {
         isActive: !currentStatus,
       });
-      toast.success(`Product ${!currentStatus ? 'activated' : 'deactivated'}`);
+      toast.success(`Product ${!currentStatus ? "activated" : "deactivated"}`);
       loadProducts();
     } catch (error) {
-      toast.error('Failed to update product status');
+      toast.error("Failed to update product status");
     }
   };
 
   const deleteProduct = async (productId: string, productName: string) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${productName}"? This cannot be undone.`
+        `Are you sure you want to delete "${productName}"? This cannot be undone.`,
       )
     ) {
       return;
@@ -106,10 +106,10 @@ export default function ProductsPage() {
 
     try {
       await axios.delete(`/api/admin/products/${productId}`);
-      toast.success('Product deleted successfully');
+      toast.success("Product deleted successfully");
       loadProducts();
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to delete product');
+      toast.error(error.response?.data?.error || "Failed to delete product");
     }
   };
 
@@ -200,8 +200,8 @@ export default function ProductsPage() {
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {search || categoryFilter
-                ? 'Try adjusting your filters'
-                : 'Get started by adding your first product'}
+                ? "Try adjusting your filters"
+                : "Get started by adding your first product"}
             </p>
             <Link
               href="/admin/products/new"
@@ -247,7 +247,7 @@ export default function ProductsPage() {
                       ? Math.round(
                           ((product.comparePrice - product.price) /
                             product.comparePrice) *
-                            100
+                            100,
                         )
                       : 0;
 
@@ -279,7 +279,7 @@ export default function ProductsPage() {
                               </p>
                               <p className="text-xs text-gray-400">
                                 {product.variants.length} variant
-                                {product.variants.length !== 1 ? 's' : ''}
+                                {product.variants.length !== 1 ? "s" : ""}
                               </p>
                             </div>
                           </div>
@@ -296,12 +296,12 @@ export default function ProductsPage() {
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
                             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                              ₦{product.price.toLocaleString()}
+                              ${product.price.toLocaleString()}
                             </span>
                             {product.comparePrice && (
                               <div className="flex items-center gap-2">
                                 <span className="text-xs text-gray-500 line-through">
-                                  ₦{product.comparePrice.toLocaleString()}
+                                  {product.comparePrice.toLocaleString()}
                                 </span>
                                 <span className="text-xs font-semibold text-red-600">
                                   -{discount}%
@@ -316,10 +316,10 @@ export default function ProductsPage() {
                           <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                               totalStock === 0
-                                ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                                 : totalStock < 10
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-                                : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                                  : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
                             }`}
                           >
                             {totalStock} units
@@ -333,15 +333,15 @@ export default function ProductsPage() {
                               onClick={() =>
                                 toggleProductStatus(
                                   product.id,
-                                  product.isActive
+                                  product.isActive,
                                 )
                               }
                               className={`p-1.5 rounded-lg transition ${
                                 product.isActive
-                                  ? 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400'
+                                  ? "bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
                               }`}
-                              title={product.isActive ? 'Active' : 'Inactive'}
+                              title={product.isActive ? "Active" : "Inactive"}
                             >
                               {product.isActive ? (
                                 <Eye size={16} />
@@ -362,7 +362,7 @@ export default function ProductsPage() {
                           <span className="text-sm text-gray-600 dark:text-gray-400">
                             {format(
                               new Date(product.createdAt),
-                              'MMM dd, yyyy'
+                              "MMM dd, yyyy",
                             )}
                           </span>
                         </td>

@@ -270,6 +270,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  phone         String?
   role          Role      @default(CUSTOMER)
   accounts      Account[]
   sessions      Session[]

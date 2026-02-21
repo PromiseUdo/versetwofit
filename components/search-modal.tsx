@@ -150,11 +150,11 @@
 //                               <div className="flex items-center gap-2 mt-1">
 //                                 {product.oldPrice && (
 //                                   <span className="text-sm line-through text-gray-400">
-//                                     ₦{product.oldPrice.toLocaleString()}
+//                                     ${product.oldPrice.toLocaleString()}
 //                                   </span>
 //                                 )}
 //                                 <span className="text-lg font-bold text-[#B5844A]">
-//                                   ₦{product.price.toLocaleString()}
+//                                   ${product.price.toLocaleString()}
 //                                 </span>
 //                               </div>
 //                             </div>
@@ -175,17 +175,17 @@
 // }
 
 // components/search-modal.tsx
-'use client';
+"use client";
 
-import { X, Search } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { X, Search } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function SearchModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -193,14 +193,14 @@ export default function SearchModal() {
   // Open modal with Cmd+K or Ctrl+K
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setIsOpen(true);
       }
-      if (e.key === 'Escape') setIsOpen(false);
+      if (e.key === "Escape") setIsOpen(false);
     };
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, []);
 
   // Focus input when opened
@@ -224,7 +224,7 @@ export default function SearchModal() {
         const data = await res.json();
         setResults(data.products || []);
       } catch (error) {
-        console.error('Search error:', error);
+        console.error("Search error:", error);
         setResults([]);
       } finally {
         setLoading(false);
@@ -283,7 +283,7 @@ export default function SearchModal() {
               initial={{ opacity: 0, scale: 0.95, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="fixed inset-0 z-[9999] flex items-start justify-center pt-20 px-4"
               onClick={(e) => e.stopPropagation()}
             >
@@ -356,7 +356,7 @@ export default function SearchModal() {
                             href={`/products/${product.slug}`}
                             onClick={() => {
                               setIsOpen(false);
-                              setQuery('');
+                              setQuery("");
                             }}
                             className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-b border-gray-100 dark:border-gray-800 last:border-0 group"
                           >

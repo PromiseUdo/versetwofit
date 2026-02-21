@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import {
@@ -23,6 +23,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { ProductCard } from "@/components/product-card";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useWishlistStore } from "@/store/wishlist-store";
 
 type ProductVariant = {
   id: string;
@@ -99,6 +100,17 @@ export default function ProductClient({
   );
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { isInWishlist, toggleItem, fetchWishlist, isLoaded } =
+    useWishlistStore();
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const wishlisted = isInWishlist(product.id);
+
+  // Fetch wishlist on mount if logged in and not yet loaded
+  useEffect(() => {
+    if (session && !isLoaded) {
+      fetchWishlist();
+    }
+  }, [session, isLoaded, fetchWishlist]);
 
   // Extract unique colors and sizes from variants
   const availableColors = Array.from(
@@ -223,15 +235,18 @@ export default function ProductClient({
       return;
     }
 
+    if (isWishlistLoading) return;
+    setIsWishlistLoading(true);
+
     try {
-      await axios.post("/api/wishlist", { productId: product.id });
-      toast.success("Added to wishlist!");
-    } catch (error: any) {
-      if (error.response?.status === 409) {
-        toast.error("Already in wishlist");
-      } else {
-        toast.error(error.response?.data?.error || "Failed to add to wishlist");
-      }
+      const action = await toggleItem(product.id);
+      toast.success(
+        action === "added" ? "Added to wishlist!" : "Removed from wishlist",
+      );
+    } catch {
+      toast.error("Failed to update wishlist");
+    } finally {
+      setIsWishlistLoading(false);
     }
   };
 
@@ -285,10 +300,10 @@ export default function ProductClient({
             <p className="mt-1 font-medium text-zinc-600">
               {hasDiscount && (
                 <del className="opacity-40">
-                  ₦{product.comparePrice?.toLocaleString()}
+                  ${product.comparePrice?.toLocaleString()}
                 </del>
               )}{" "}
-              ₦{finalPrice.toLocaleString()}
+              ${finalPrice.toLocaleString()}
               {hasDiscount && (
                 <span className="text-green-400">
                   {" "}
@@ -436,10 +451,18 @@ export default function ProductClient({
 
               <button
                 onClick={handleAddToWishlist}
-                className="h-11 w-full rounded-md border border-zinc-300 hover:bg-zinc-100 transition-colors flex items-center justify-center gap-2 font-medium text-zinc-700"
+                disabled={isWishlistLoading}
+                className={`h-11 w-full rounded-md border transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
+                  wishlisted
+                    ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                    : "border-zinc-300 text-zinc-700 hover:bg-zinc-100"
+                }`}
               >
-                <IconHeart size={20} />
-                Add to Wishlist
+                <IconHeart
+                  size={20}
+                  className={wishlisted ? "fill-red-500 text-red-500" : ""}
+                />
+                {wishlisted ? "In Wishlist" : "Add to Wishlist"}
               </button>
             </div>
 
@@ -458,7 +481,7 @@ export default function ProductClient({
             {/* Accordions */}
             <div className="mt-8 divide-y divide-zinc-200">
               {[
-                { title: "Shipping", content: "Free shipping over ₦50,000." },
+                { title: "Shipping", content: "Free shipping over $50,000." },
                 { title: "Returns", content: "30-day return policy." },
               ].map((section) => (
                 <details key={section.title} className="py-4">
