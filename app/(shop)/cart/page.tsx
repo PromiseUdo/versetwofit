@@ -409,26 +409,30 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-2xl shadow-sm p-12">
-            <ShoppingBag className="w-24 h-24 mx-auto text-gray-300 mb-6" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">
-              Your cart is empty
-            </h2>
-            <p className="text-gray-600 mb-8">
-              Looks like you haven't added anything to your cart yet
-            </p>
-            <Link
-              href="/products"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition"
-            >
-              Start Shopping
-              <ArrowRight size={18} />
-            </Link>
+      <>
+        <div className="fixed top-0 left-0 right-0 h-48 bg-linear-to-b from-black/80 via-black/30 to-transparent pointer-events-none z-10" />
+
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+          <div className="max-w-md w-full text-center">
+            <div className="bg-white rounded-2xl shadow-sm p-12">
+              <ShoppingBag className="w-24 h-24 mx-auto text-gray-300 mb-6" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                Your cart is empty
+              </h2>
+              <p className="text-gray-600 mb-8">
+                Looks like you haven't added anything to your cart yet
+              </p>
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 px-6 py-3  font-medium rounded-lg transition bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
+              >
+                Start Shopping
+                <ArrowRight size={18} />
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 

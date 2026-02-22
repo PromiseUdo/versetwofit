@@ -1,17 +1,17 @@
-'use client';
-import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
-import { cn } from '@/lib/utils';
+"use client";
+import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import {
   IconArrowLeft,
   IconBox,
   IconBrandTabler,
   IconSettings,
   IconUserBolt,
-} from '@tabler/icons-react';
-import { signOut } from 'next-auth/react';
-import Image from 'next/image';
-import React, { useState } from 'react';
-import toast from 'react-hot-toast';
+} from "@tabler/icons-react";
+import { signOut } from "next-auth/react";
+import Image from "next/image";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 interface AdminUser {
   id: string;
@@ -29,32 +29,32 @@ interface AdminSidebarProps {
 export function AdminSidebar({ user, children }: AdminSidebarProps) {
   const handleSignOut = async () => {
     try {
-      await signOut({ callbackUrl: '/' });
-      toast.success('Signed out successfully');
+      await signOut({ callbackUrl: "/" });
+      toast.success("Signed out successfully");
     } catch (error) {
-      toast.error('Failed to sign out');
+      toast.error("Failed to sign out");
     }
   };
 
   const links = [
     {
-      label: 'Dashboard',
-      href: '#',
+      label: "Overview",
+      href: "/admin",
       icon: (
         <IconBrandTabler className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
 
     {
-      label: 'Categories',
-      href: '/admin/categories',
+      label: "Categories",
+      href: "/admin/categories",
       icon: (
         <IconBox className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
-      label: 'Products',
-      href: '/admin/products',
+      label: "Products",
+      href: "/admin/products",
       icon: (
         <IconBox className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
@@ -67,15 +67,15 @@ export function AdminSidebar({ user, children }: AdminSidebarProps) {
     //   ),
     // },
     {
-      label: 'Orders',
-      href: '/admin/orders',
+      label: "Orders",
+      href: "/admin/orders",
       icon: (
         <IconUserBolt className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
-      label: 'Settings',
-      href: '#',
+      label: "Settings",
+      href: "#",
       icon: (
         <IconSettings className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
@@ -85,8 +85,8 @@ export function AdminSidebar({ user, children }: AdminSidebarProps) {
   return (
     <div
       className={cn(
-        'flex w-full flex-1 overflow-hidden  border bg-gray-100 dark:bg-neutral-800',
-        'h-screen'
+        "flex w-full flex-1 overflow-hidden  border bg-gray-100 dark:bg-neutral-800",
+        "h-screen",
       )}
     >
       <Sidebar open={open} setOpen={setOpen} animate={false}>
@@ -113,8 +113,8 @@ export function AdminSidebar({ user, children }: AdminSidebarProps) {
           <div>
             <SidebarLink
               link={{
-                label: user?.name || '',
-                href: '/admin/settings',
+                label: user?.name || "",
+                href: "/admin/settings",
                 icon: (
                   <img
                     src="https://assets.aceternity.com/manu.png"
@@ -169,7 +169,7 @@ export const LogoIcon = () => {
         height={38}
         className="shrink-0 brightness-0 invert"
         priority
-      />{' '}
+      />{" "}
     </a>
   );
 };
