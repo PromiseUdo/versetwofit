@@ -117,11 +117,14 @@ export function AdminSidebar({ user, children }: AdminSidebarProps) {
                 href: "/admin/settings",
                 icon: (
                   <img
-                    src="https://assets.aceternity.com/manu.png"
-                    className="h-7 w-7 shrink-0 rounded-full"
+                    src={
+                      user?.image ||
+                      `https://ui-avatars.com/api/?name=${user?.name || "Admin"}&background=random`
+                    }
+                    className="h-7 w-7 shrink-0 rounded-full object-cover"
                     width={50}
                     height={50}
-                    alt="Avatar"
+                    alt={user?.name || "Avatar"}
                   />
                 ),
               }}
