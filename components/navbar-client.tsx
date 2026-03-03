@@ -719,7 +719,7 @@
 //   );
 // }
 
-'use client';
+"use client";
 
 import {
   DropdownMenu,
@@ -727,7 +727,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   MobileNav,
   MobileNavHeader,
@@ -736,7 +736,7 @@ import {
   Navbar,
   NavbarLogo,
   NavBody,
-} from '@/components/ui/resizable-navbar';
+} from "@/components/ui/resizable-navbar";
 import {
   IconHeart,
   IconLogout,
@@ -759,16 +759,16 @@ import {
   IconChevronDown,
   IconBackpack,
   IconBallBasketball,
-} from '@tabler/icons-react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { signOut } from 'next-auth/react';
-import Link from 'next/link';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import toast from 'react-hot-toast';
-import SearchModal from './search-modal';
-import Image from 'next/image';
-import { useCartStore } from '@/store/cart-store';
-import type { ComponentType } from 'react';
+} from "@tabler/icons-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
+import { useState, useEffect, useRef, useCallback } from "react";
+import toast from "react-hot-toast";
+import SearchModal from "./search-modal";
+import Image from "next/image";
+import { useCartStore } from "@/store/cart-store";
+import type { ComponentType } from "react";
 
 interface CategoryItem {
   id: string;
@@ -788,20 +788,23 @@ interface NavbarClientProps {
 }
 
 // Map category slugs to relevant Tabler icons
-const categoryIconMap: Record<string, ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
-  't-shirts': IconShirt,
-  'headwears': IconCrown,
-  'headwear': IconCrown,
-  'accessories': IconDiamond,
-  'tops': IconHanger,
-  'kicks': IconShoe,
-  'sunglasses': IconSunglasses,
-  'watches': IconDeviceWatch,
-  'jackets': IconJacket,
-  'bags': IconBackpack,
-  'jerseys': IconBallBasketball,
-  'sweatshirt': IconJacket,
-  'sweatshirts': IconJacket,
+const categoryIconMap: Record<
+  string,
+  ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
+> = {
+  "t-shirts": IconShirt,
+  headwears: IconCrown,
+  headwear: IconCrown,
+  accessories: IconDiamond,
+  tops: IconHanger,
+  kicks: IconShoe,
+  sunglasses: IconSunglasses,
+  watches: IconDeviceWatch,
+  jackets: IconJacket,
+  bags: IconBackpack,
+  jerseys: IconBallBasketball,
+  sweatshirt: IconJacket,
+  sweatshirts: IconJacket,
 };
 
 function getCategoryIcon(slug: string) {
@@ -817,7 +820,8 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
   const categoriesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const openCategories = useCallback(() => {
-    if (categoriesTimeoutRef.current) clearTimeout(categoriesTimeoutRef.current);
+    if (categoriesTimeoutRef.current)
+      clearTimeout(categoriesTimeoutRef.current);
     setIsCategoriesOpen(true);
   }, []);
 
@@ -830,7 +834,8 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
-      if (categoriesTimeoutRef.current) clearTimeout(categoriesTimeoutRef.current);
+      if (categoriesTimeoutRef.current)
+        clearTimeout(categoriesTimeoutRef.current);
     };
   }, []);
 
@@ -862,17 +867,17 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
 
   const navItems = [
     {
-      name: 'About',
-      link: '/about',
+      name: "About",
+      link: "/about",
     },
   ];
 
   const handleSignOut = async () => {
     try {
-      await signOut({ callbackUrl: '/' });
-      toast.success('Signed out successfully');
+      await signOut({ callbackUrl: "/" });
+      toast.success("Signed out successfully");
     } catch (error) {
-      toast.error('Failed to sign out');
+      toast.error("Failed to sign out");
     }
   };
 
@@ -921,7 +926,7 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                       initial={{ opacity: 0, y: 8, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
                       className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[500px] bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl rounded-xl overflow-hidden z-20"
                     >
                       <div className="p-3 grid grid-cols-2 gap-1">
@@ -999,13 +1004,13 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0, opacity: 0 }}
                       transition={{
-                        type: 'spring',
+                        type: "spring",
                         stiffness: 500,
                         damping: 25,
                       }}
                       className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-gray-900"
                     >
-                      {totalItems > 99 ? '99+' : totalItems}
+                      {totalItems > 99 ? "99+" : totalItems}
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -1018,16 +1023,19 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative p-2"
+                  className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
                   aria-label="Account menu"
                 >
-                  {user?.image ? (
-                    <Image
-                      src={user.image}
-                      alt={user.name}
-                      width={24}
-                      height={24}
-                      className="rounded-full ring-2 ring-gray-200 dark:ring-gray-700"
+                  {user ? (
+                    <img
+                      src={
+                        user.image ||
+                        `https://ui-avatars.com/api/?name=${user.name || "User"}&background=random`
+                      }
+                      alt={user.name || "User"}
+                      width={22}
+                      height={22}
+                      className="rounded-full object-cover"
                     />
                   ) : (
                     <IconUser
@@ -1049,22 +1057,16 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                     {/* User Info */}
                     <div className="px-4 py-3 bg-gradient-to-r from-primary/5 to-primary/10 dark:from-gray-800 dark:to-gray-900">
                       <div className="flex items-center gap-3">
-                        {user.image ? (
-                          <Image
-                            src={user.image}
-                            alt={user.name}
-                            width={40}
-                            height={40}
-                            className="rounded-full ring-2 ring-white dark:ring-gray-800"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                            <IconUserCircle
-                              size={24}
-                              className="text-primary dark:text-primary-foreground"
-                            />
-                          </div>
-                        )}
+                        <img
+                          src={
+                            user.image ||
+                            `https://ui-avatars.com/api/?name=${user.name || "User"}&background=random`
+                          }
+                          alt={user.name || "User"}
+                          width={40}
+                          height={40}
+                          className="rounded-full ring-2 ring-white dark:ring-gray-800 object-cover"
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                             {user.name}
@@ -1074,7 +1076,7 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                           </p>
                         </div>
                       </div>
-                      {user.role === 'ADMIN' && (
+                      {user.role === "ADMIN" && (
                         <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-primary/10 dark:bg-primary/20 rounded-full">
                           <IconShieldCheck
                             size={12}
@@ -1090,7 +1092,7 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                     <DropdownMenuSeparator />
 
                     {/* Admin Dashboard */}
-                    {user.role === 'ADMIN' && (
+                    {user.role === "ADMIN" && (
                       <>
                         <DropdownMenuItem asChild>
                           <Link
@@ -1229,7 +1231,7 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                         exit={{ scale: 0 }}
                         className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center"
                       >
-                        {totalItems > 9 ? '9+' : totalItems}
+                        {totalItems > 9 ? "9+" : totalItems}
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -1251,22 +1253,16 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
             {user ? (
               <div className="px-4 py-4 bg-gradient-to-r from-primary/5 to-primary/10 dark:from-gray-800 dark:to-gray-900 rounded-xl mb-4">
                 <div className="flex items-center gap-3">
-                  {user.image ? (
-                    <Image
-                      src={user.image}
-                      alt={user.name}
-                      width={48}
-                      height={48}
-                      className="rounded-full ring-2 ring-white dark:ring-gray-800"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                      <IconUserCircle
-                        size={28}
-                        className="text-primary dark:text-primary-foreground"
-                      />
-                    </div>
-                  )}
+                  <img
+                    src={
+                      user.image ||
+                      `https://ui-avatars.com/api/?name=${user.name || "User"}&background=random`
+                    }
+                    alt={user.name || "User"}
+                    width={48}
+                    height={48}
+                    className="rounded-full ring-2 ring-white dark:ring-gray-800 object-cover"
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                       {user.name}
@@ -1274,7 +1270,7 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                     <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                       {user.email}
                     </p>
-                    {user.role === 'ADMIN' && (
+                    {user.role === "ADMIN" && (
                       <span className="inline-block mt-1 text-xs px-2 py-0.5 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground rounded-full font-medium">
                         Admin
                       </span>
@@ -1295,16 +1291,16 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                   >
                     Login
                   </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-center text-sm font-medium hover:bg-primary/90 transition-colors"
-                    >
-                      Sign Up
-                    </Link>
-                  </div>
+                  <Link
+                    href="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-center text-sm font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Sign Up
+                  </Link>
                 </div>
-              )}
+              </div>
+            )}
 
             {/* Navigation Links */}
             <div className="space-y-1 mb-4">
@@ -1386,48 +1382,48 @@ export function NavbarClient({ user, categories }: NavbarClientProps) {
                 />
                 <span className="font-medium">Shopping Cart</span>
                 {mounted && totalItems > 0 && (
-                      <span className="ml-auto bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
-                        {totalItems}
-                      </span>
-                    )}
+                  <span className="ml-auto bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+
+              {user && (
+                <>
+                  <Link
+                    href="/orders"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <IconPackage
+                      size={20}
+                      className="text-gray-500 dark:text-gray-400"
+                    />
+                    <span className="font-medium">My Orders</span>
                   </Link>
 
-                  {user && (
-                    <>
-                      <Link
-                        href="/orders"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                      >
-                        <IconPackage
-                          size={20}
-                          className="text-gray-500 dark:text-gray-400"
-                        />
-                        <span className="font-medium">My Orders</span>
-                      </Link>
+                  {user.role === "ADMIN" && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-primary hover:bg-primary/10 transition-colors"
+                    >
+                      <IconShieldCheck size={20} />
+                      <span className="font-semibold">Admin Dashboard</span>
+                    </Link>
+                  )}
 
-                      {user.role === 'ADMIN' && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 rounded-lg text-primary hover:bg-primary/10 transition-colors"
-                        >
-                          <IconShieldCheck size={20} />
-                          <span className="font-semibold">Admin Dashboard</span>
-                        </Link>
-                      )}
-
-                      <Link
-                        href="/account"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                      >
-                        <IconSettings
-                          size={20}
-                          className="text-gray-500 dark:text-gray-400"
-                        />
-                        <span className="font-medium">Account Settings</span>
-                      </Link>
+                  <Link
+                    href="/account"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <IconSettings
+                      size={20}
+                      className="text-gray-500 dark:text-gray-400"
+                    />
+                    <span className="font-medium">Account Settings</span>
+                  </Link>
 
                   <button
                     onClick={() => {
