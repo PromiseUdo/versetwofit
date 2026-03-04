@@ -862,7 +862,7 @@ export default function CheckoutPage() {
                         />
                         <div className="text-left">
                           <p className="font-semibold text-gray-900 text-sm">
-                            Pay in 4 with Klarna
+                            Pay with Klarna
                           </p>
                           <p className="text-xs text-gray-500">
                             4 interest-free payments
