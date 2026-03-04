@@ -479,7 +479,7 @@ export default function ProductClient({
             </div>
 
             {/* Accordions */}
-            <div className="mt-8 divide-y divide-zinc-200">
+            {/* <div className="mt-8 divide-y divide-zinc-200">
               {[
                 { title: "Shipping", content: "Free shipping over $50,000." },
                 { title: "Returns", content: "30-day return policy." },
@@ -493,7 +493,7 @@ export default function ProductClient({
                   </p>
                 </details>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
 
