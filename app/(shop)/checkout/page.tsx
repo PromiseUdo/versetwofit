@@ -856,7 +856,7 @@ export default function CheckoutPage() {
                           </div>
                         )}
                         <img
-                          src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg"
+                          src="/klarna.png"
                           alt="Klarna"
                           className="h-8 w-auto shrink-0"
                         />

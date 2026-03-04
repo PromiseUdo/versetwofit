@@ -100,11 +100,7 @@ export default function CheckoutForm({
       <div className=" rounded-xl shadow-sm p-6  ">
         <div className="flex items-center gap-3 mb-4">
           {paymentMethod === "klarna" ? (
-            <img
-              src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg"
-              alt="Klarna"
-              className="h-8 w-auto"
-            />
+            <img src="/klarna.png" alt="Klarna" className="h-8 w-auto" />
           ) : (
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
               <CreditCard className="w-6 h-6 text-primary" />
@@ -232,7 +228,7 @@ export default function CheckoutForm({
       {/* Klarna BNPL Banner */}
       <div className="bg-[#ffd6e7] rounded-xl p-5 flex items-start gap-4 border border-[#ffb3d1]">
         <img
-          src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg"
+          src="/klarna.png"
           alt="Klarna"
           className="h-7 w-auto shrink-0 mt-0.5"
         />
@@ -286,11 +282,7 @@ export default function CheckoutForm({
           ))}
           {/* Klarna Badge */}
           <div className="px-3 py-1.5 bg-[#ffd6e7] rounded-lg border border-[#ffb3d1] flex items-center gap-2 shadow-sm">
-            <img
-              src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg"
-              alt="Klarna"
-              className="h-4 w-auto"
-            />
+            <img src="/klarna.png" alt="Klarna" className="h-4 w-auto" />
             <span className="text-xs font-semibold text-gray-800">
               Pay in 4
             </span>
