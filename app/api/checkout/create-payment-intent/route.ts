@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       shippingMethodId,
       selectedRate, // Dynamic rate from UniUni API (if available)
       totals,
+      paymentMethod = 'card', // 'card' | 'klarna'
     } = body;
 
     // Validate request
@@ -297,18 +298,37 @@ export async function POST(req: NextRequest) {
     }
 
     // Create Stripe payment intent
+    // Shipping + customer details are required for Klarna to appear in PaymentElement
+    const isKlarna = paymentMethod === 'klarna';
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(totals.total * 100),
       currency: 'cad',
+      receipt_email: email,
       metadata: {
         orderId: order.id,
         orderNumber: orderNumber,
         userId: session.user.id,
         uniUniOrderNumber: uniUniShipment?.orderNumber || '',
+        paymentMethod,
       },
-      automatic_payment_methods: {
-        enabled: true,
+      shipping: {
+        name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+        phone: phone,
+        address: {
+          line1: shippingAddress.street,
+          line2: shippingAddress.apartment || undefined,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          postal_code: shippingAddress.zipCode,
+          country: 'CA',
+        },
       },
+      // For Klarna: explicit payment_method_types is required
+      // For card: automatic_payment_methods covers all card types
+      ...(isKlarna
+        ? { payment_method_types: ['klarna'] }
+        : { automatic_payment_methods: { enabled: true } }
+      ),
     });
 
     // Update order with Stripe payment ID

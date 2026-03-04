@@ -1,15 +1,15 @@
 // src/app/checkout/payment/page.tsx
-'use client';
+"use client";
 
-import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { Loader2 } from 'lucide-react';
-import CheckoutForm from './checkout-form';
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { Loader2 } from "lucide-react";
+import CheckoutForm from "./checkout-form";
 
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
 );
 
 function PaymentPageContent() {
@@ -17,18 +17,21 @@ function PaymentPageContent() {
   const searchParams = useSearchParams();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "klarna">("card");
 
   useEffect(() => {
-    const secret = searchParams.get('client_secret');
-    const order = searchParams.get('order_id');
+    const secret = searchParams.get("client_secret");
+    const order = searchParams.get("order_id");
+    const method = searchParams.get("payment_method");
 
     if (!secret || !order) {
-      router.push('/checkout');
+      router.push("/checkout");
       return;
     }
 
     setClientSecret(secret);
     setOrderId(order);
+    if (method === "klarna") setPaymentMethod("klarna");
   }, [searchParams, router]);
 
   if (!clientSecret || !orderId) {
@@ -43,15 +46,15 @@ function PaymentPageContent() {
   }
 
   const appearance = {
-    theme: 'stripe' as const,
+    theme: "stripe" as const,
     variables: {
-      colorPrimary: '#303d32',
-      colorBackground: '#ffffff',
-      colorText: '#1f2937',
-      colorDanger: '#ef4444',
-      fontFamily: 'system-ui, sans-serif',
-      spacingUnit: '4px',
-      borderRadius: '8px',
+      colorPrimary: paymentMethod === "klarna" ? "#FFB3D1" : "#303d32",
+      colorBackground: "#ffffff",
+      colorText: "#1f2937",
+      colorDanger: "#ef4444",
+      fontFamily: "system-ui, sans-serif",
+      spacingUnit: "4px",
+      borderRadius: "8px",
     },
   };
 
@@ -64,7 +67,7 @@ function PaymentPageContent() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <Elements stripe={stripePromise} options={options}>
-          <CheckoutForm orderId={orderId} />
+          <CheckoutForm orderId={orderId} paymentMethod={paymentMethod} />
         </Elements>
       </div>
     </div>

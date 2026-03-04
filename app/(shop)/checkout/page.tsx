@@ -62,6 +62,9 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationComplete, setValidationComplete] = useState(false);
   const [loadingRates, setLoadingRates] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "card" | "klarna"
+  >("card");
 
   // Shipping Information (CANADIAN FORMAT)
   const [shippingInfo, setShippingInfo] = useState({
@@ -300,8 +303,8 @@ export default function CheckoutPage() {
           street: shippingInfo.street,
           apartment: shippingInfo.apartment,
           city: shippingInfo.city,
-          state: shippingInfo.province, // API expects 'state' but it's actually province
-          zipCode: shippingInfo.postalCode, // API expects 'zipCode'
+          state: shippingInfo.province,
+          zipCode: shippingInfo.postalCode,
         },
         billingAddress: billingSameAsShipping
           ? {
@@ -318,8 +321,9 @@ export default function CheckoutPage() {
         phone: shippingInfo.phone,
         shippingMethodId:
           fetchedShippingRate?.postageType || selectedShippingMethod.id,
-        selectedRate: fetchedShippingRate, // Pass the fetched rate for order reuse
+        selectedRate: fetchedShippingRate,
         totals: normalizedTotals,
+        paymentMethod: selectedPaymentMethod, // ← new
       });
 
       const { clientSecret, orderId } = response.data;
@@ -327,9 +331,9 @@ export default function CheckoutPage() {
       // Store order ID for confirmation page
       sessionStorage.setItem("pendingOrderId", orderId);
 
-      // Redirect to payment page with client secret
+      // Redirect to payment page with client secret and selected method
       router.push(
-        `/checkout/payment?client_secret=${clientSecret}&order_id=${orderId}`,
+        `/checkout/payment?client_secret=${clientSecret}&order_id=${orderId}&payment_method=${selectedPaymentMethod}`,
       );
     } catch (error: any) {
       console.error("Payment intent creation error:", error);
@@ -676,7 +680,7 @@ export default function CheckoutPage() {
 
                     {/* Info Alert */}
                     <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg mb-4">
-                      <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                       <p className="text-sm text-primary">
                         Select your preferred shipping method. The exact
                         shipping rate will be calculated when you continue to
@@ -798,39 +802,130 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Payment Section */}
+                  {/* Payment Method Selector */}
                   <div className="bg-white rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-2 mb-6">
                       <CreditCard className="text-primary" size={24} />
                       <h3 className="text-lg font-bold text-gray-900">
-                        Payment
+                        Choose Payment Method
                       </h3>
                     </div>
 
-                    <div className="bg-primary/5 rounded-lg p-6 mb-6 border border-primary/10">
-                      <div className="flex items-start gap-3">
-                        <Lock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-gray-900 mb-1">
-                            Secure Payment with Stripe
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                      {/* Card Option */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPaymentMethod("card")}
+                        className={`relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+                          selectedPaymentMethod === "card"
+                            ? "border-primary bg-primary/5"
+                            : "border-gray-200 hover:border-gray-300 bg-white"
+                        }`}
+                      >
+                        {selectedPaymentMethod === "card" && (
+                          <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <Check size={12} className="text-white" />
+                          </div>
+                        )}
+                        <div className="w-12 h-8 bg-linear-to-br from-gray-700 to-gray-900 rounded-md flex items-center justify-center shrink-0">
+                          <CreditCard size={18} className="text-white" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-semibold text-gray-900 text-sm">
+                            Credit / Debit Card
                           </p>
-                          <p className="text-sm text-gray-600">
-                            Your payment information is encrypted and secure. We
-                            never store your card details.
+                          <p className="text-xs text-gray-500">
+                            Visa, Mastercard &amp; more
                           </p>
                         </div>
+                      </button>
+
+                      {/* Klarna Option */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPaymentMethod("klarna")}
+                        className={`relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+                          selectedPaymentMethod === "klarna"
+                            ? "border-[#ffb3d1] bg-[#fff0f6]"
+                            : "border-gray-200 hover:border-[#ffb3d1] bg-white"
+                        }`}
+                      >
+                        {selectedPaymentMethod === "klarna" && (
+                          <div className="absolute top-2 right-2 w-5 h-5 bg-[#FFB3D1] rounded-full flex items-center justify-center">
+                            <Check size={12} className="text-gray-800" />
+                          </div>
+                        )}
+                        <img
+                          src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg"
+                          alt="Klarna"
+                          className="h-8 w-auto shrink-0"
+                        />
+                        <div className="text-left">
+                          <p className="font-semibold text-gray-900 text-sm">
+                            Pay in 4 with Klarna
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            4 interest-free payments
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Klarna explanation when selected */}
+                    {selectedPaymentMethod === "klarna" && (
+                      <div className="flex items-start gap-3 p-4 bg-[#fff0f6] border border-[#ffb3d1] rounded-lg mb-6">
+                        <Info className="w-4 h-4 text-pink-500 shrink-0 mt-0.5" />
+                        <p className="text-xs text-gray-700">
+                          You'll complete your Klarna payment on the next page.
+                          Split your total of{" "}
+                          <strong>
+                            {formatCurrency(normalizedTotals.total)}
+                          </strong>{" "}
+                          into{" "}
+                          <strong>
+                            4 payments of{" "}
+                            {formatCurrency(normalizedTotals.total / 4)}
+                          </strong>{" "}
+                          every 2 weeks — interest free.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Security notice */}
+                    <div className="bg-primary/5 rounded-lg p-4 mb-6 border border-primary/10">
+                      <div className="flex items-start gap-3">
+                        <Lock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <p className="text-sm text-gray-600">
+                          Your payment information is encrypted and secure.
+                          {selectedPaymentMethod === "klarna"
+                            ? " Klarna is processed securely via Stripe."
+                            : " We never store your card details."}
+                        </p>
                       </div>
                     </div>
 
                     <button
                       onClick={handleCreatePaymentIntent}
                       disabled={isProcessing}
-                      className="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className={`w-full py-4 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                        selectedPaymentMethod === "klarna"
+                          ? "bg-[#FFB3D1] hover:bg-[#ff9dc2] text-gray-900"
+                          : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                      }`}
                     >
                       {isProcessing ? (
                         <>
                           <Loader2 className="w-5 h-5 animate-spin" />
                           Processing...
+                        </>
+                      ) : selectedPaymentMethod === "klarna" ? (
+                        <>
+                          <img
+                            src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg"
+                            alt=""
+                            className="h-4 w-auto"
+                          />
+                          Continue with Klarna
                         </>
                       ) : (
                         <>
@@ -860,7 +955,7 @@ export default function CheckoutPage() {
                 <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-3">
-                      <div className="relative w-16 h-16 mt-2 bg-gray-100 rounded-lg flex-shrink-0">
+                      <div className="relative w-16 h-16 mt-2 bg-gray-100 rounded-lg shrink-0">
                         <Image
                           src={item.image}
                           alt={item.productName}
