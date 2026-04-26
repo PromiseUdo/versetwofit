@@ -8,8 +8,9 @@ export interface CartItem {
   productName: string;
   productSlug: string;
   variantSku: string;
-  color: string | null;
-  size: string | null;
+  variantOptions: { name: string; value: string }[];
+  color: string | null; // derived from variantOptions for checkout compatibility
+  size: string | null;  // derived from variantOptions for checkout compatibility
   price: number;
   quantity: number;
   image: string;

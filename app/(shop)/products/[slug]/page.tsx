@@ -33,6 +33,7 @@ export default async function ProductPage({ params }: PageProps) {
     images: product.images,
     aboutItems: product.aboutItems || [],
     specifications: product.specifications || [],
+    options: product.options || [],
     category: {
       id: product.category.id,
       name: product.category.name,
@@ -40,8 +41,7 @@ export default async function ProductPage({ params }: PageProps) {
     },
     variants: product.variants.map((variant: any) => ({
       id: variant.id,
-      color: variant.color,
-      size: variant.size,
+      options: variant.options || [],
       sku: variant.sku,
       stock: variant.stock,
       price: variant.price,
@@ -80,8 +80,7 @@ export default async function ProductPage({ params }: PageProps) {
     },
     variants: p.variants.map((v: any) => ({
       id: v.id,
-      color: v.color,
-      size: v.size,
+      options: v.options || [],
       stock: v.stock,
       price: v.price,
     })),

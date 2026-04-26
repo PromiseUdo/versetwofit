@@ -5,14 +5,20 @@ import ProductReel from '@/components/product-reel';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
-  const categories = await prisma.category.findMany({
-    select: { id: true, name: true, slug: true },
-    orderBy: { name: 'asc' },
-  });
+  const [categories, heroSlides] = await Promise.all([
+    prisma.category.findMany({
+      select: { id: true, name: true, slug: true },
+      orderBy: { name: 'asc' },
+    }),
+    prisma.heroSlide.findMany({
+      where: { isActive: true },
+      orderBy: { order: 'asc' },
+    }),
+  ]);
 
   return (
     <main>
-      <HeroSlider categories={categories} />
+      <HeroSlider slides={heroSlides} categories={categories} />
       <FeaturedCategoriesCarousel />
       <ProductReel type="new-arrivals" />
       <CategoryPreview />

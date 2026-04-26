@@ -260,15 +260,13 @@ import { useWishlistStore } from "@/store/wishlist-store";
 
 interface Variant {
   id: string;
-  color: string | null;
-  size: string | null;
+  options: { name: string; value: string }[];
   stock: number;
   price: number | null;
   length?: number | null;
   width?: number | null;
   height?: number | null;
   weight?: number | null;
-  // sku: string;
 }
 
 interface ProductCardProps {
@@ -317,14 +315,6 @@ export function ProductCard({ product }: ProductCardProps) {
   // Get total stock
   const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
 
-  // Get unique colors and sizes
-  const colors = [
-    ...new Set(product.variants.filter((v) => v.color).map((v) => v.color)),
-  ];
-  const sizes = [
-    ...new Set(product.variants.filter((v) => v.size).map((v) => v.size)),
-  ];
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -334,7 +324,6 @@ export function ProductCard({ product }: ProductCardProps) {
       return;
     }
 
-    // Find the first available variant
     const availableVariant = product.variants.find((v) => v.stock > 0);
 
     if (!availableVariant) {
@@ -342,18 +331,20 @@ export function ProductCard({ product }: ProductCardProps) {
       return;
     }
 
-    // Determine the price to use
     const itemPrice = availableVariant.price ?? product.price;
+    const opts = availableVariant.options ?? [];
+    const colorOpt = opts.find((o) => o.name.toLowerCase() === "color");
+    const sizeOpt = opts.find((o) => o.name.toLowerCase() === "size");
 
-    // Add to cart
     addItem({
       id: availableVariant.id,
       productId: product.id,
       productName: product.name,
       productSlug: product.slug,
       variantSku: "",
-      color: availableVariant.color,
-      size: availableVariant.size,
+      variantOptions: opts,
+      color: colorOpt?.value ?? null,
+      size: sizeOpt?.value ?? null,
       price: itemPrice,
       quantity: 1,
       image: product.images[0] || "/hero1.jpg",
@@ -364,14 +355,9 @@ export function ProductCard({ product }: ProductCardProps) {
       weight: availableVariant.weight ?? null,
     });
 
+    const variantDesc = opts.map((o) => o.value).join(", ");
     toast.success(
-      `${product.name} added to cart${
-        availableVariant.color || availableVariant.size
-          ? ` (${[availableVariant.color, availableVariant.size]
-              .filter(Boolean)
-              .join(", ")})`
-          : ""
-      }`,
+      `${product.name} added to cart${variantDesc ? ` (${variantDesc})` : ""}`,
     );
   };
 

@@ -91,8 +91,7 @@ import Link from 'next/link';
 
 interface Variant {
   id: string;
-  color: string | null;
-  size: string | null;
+  options: { name: string; value: string }[];
   stock: number;
   price: number | null;
 }

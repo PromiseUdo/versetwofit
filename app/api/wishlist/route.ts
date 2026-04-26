@@ -42,8 +42,7 @@ export async function GET() {
     },
     variants: p.variants.map((v) => ({
       id: v.id,
-      color: v.color,
-      size: v.size,
+      options: v.options,
       sku: v.sku,
       stock: v.stock,
       price: v.price,

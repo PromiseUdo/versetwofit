@@ -5,6 +5,7 @@ import {
   IconArrowLeft,
   IconBox,
   IconBrandTabler,
+  IconPhoto,
   IconSettings,
   IconUserBolt,
 } from "@tabler/icons-react";
@@ -66,6 +67,13 @@ export function AdminSidebar({ user, children }: AdminSidebarProps) {
     //     <IconUserBolt className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
     //   ),
     // },
+    {
+      label: "Hero Slides",
+      href: "/admin/hero-slides",
+      icon: (
+        <IconPhoto className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
     {
       label: "Orders",
       href: "/admin/orders",

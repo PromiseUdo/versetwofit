@@ -308,6 +308,7 @@ model Product {
   price          Float
   comparePrice   Float?
   images         String[]
+  options        ProductOption[]
   variants       ProductVariant[]
   categoryId     String                   @db.ObjectId
   category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -323,20 +324,19 @@ model Product {
 }
 
 model ProductVariant {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId String   @db.ObjectId
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  color     String?
-  size      String?
-  sku       String   @unique
-  stock     Int      @default(0)
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  productId String          @db.ObjectId
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  options   VariantOption[]
+  sku       String          @unique
+  stock     Int             @default(0)
   price     Float?
   length    Float?
   width     Float?
   height    Float?
   weight    Float?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 
   @@index([productId])
 }
@@ -440,6 +440,16 @@ type ProductSpecification {
   value String
 }
 
+type ProductOption {
+  name   String
+  values String[]
+}
+
+type VariantOption {
+  name  String
+  value String
+}
+
 enum Role {
   CUSTOMER
   ADMIN
@@ -459,4 +469,18 @@ enum PaymentStatus {
   CAPTURED
   FAILED
   REFUNDED
+}
+
+model HeroSlide {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  subtitle  String?
+  image     String
+  ctaText   String?
+  ctaLink   String?
+  alignment String   @default("center")
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

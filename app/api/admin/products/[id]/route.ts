@@ -67,6 +67,7 @@ export async function PUT(
       variants,
       aboutItems,
       specifications,
+      options,
     } = body;
 
     // Validation
@@ -167,6 +168,16 @@ export async function PUT(
           .map((item: any) => item.value.trim())
       : [];
 
+    // Process product-level options
+    const processedOptions = Array.isArray(options)
+      ? options
+          .filter((o: any) => o.name?.trim() && Array.isArray(o.values) && o.values.length > 0)
+          .map((o: any) => ({
+            name: o.name.trim(),
+            values: o.values.map((v: string) => v.trim()).filter(Boolean),
+          }))
+      : [];
+
     // Delete old variants and create new ones
     await prisma.productVariant.deleteMany({
       where: { productId: id },
@@ -187,10 +198,12 @@ export async function PUT(
         isActive: isActive !== undefined ? isActive : true,
         aboutItems: processedAboutItems,
         specifications: processedSpecifications,
+        options: processedOptions,
         variants: {
           create: variants.map((variant: any) => ({
-            color: variant.color || null,
-            size: variant.size || null,
+            options: Array.isArray(variant.options)
+              ? variant.options.filter((o: any) => o.name && o.value)
+              : [],
             sku: variant.sku,
             stock: parseInt(variant.stock) || 0,
             price: variant.price ? parseFloat(variant.price) : null,

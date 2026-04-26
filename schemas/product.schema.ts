@@ -1,4 +1,3 @@
-// Validation Schema
 import { z } from 'zod';
 
 const specificationSchema = z.object({
@@ -8,6 +7,16 @@ const specificationSchema = z.object({
 
 const aboutItemSchema = z.object({
   value: z.string().min(1, 'Item text is required'),
+});
+
+const variantOptionSchema = z.object({
+  name: z.string().min(1),
+  value: z.string().min(1),
+});
+
+const productOptionSchema = z.object({
+  name: z.string().min(1, 'Option name is required'),
+  values: z.array(z.string().min(1)).min(1, 'At least one value is required'),
 });
 
 export const productSchema = z.object({
@@ -20,19 +29,18 @@ export const productSchema = z.object({
   images: z.array(z.string()).min(1, 'At least one image is required'),
   aboutItems: z.array(aboutItemSchema).optional(),
   specifications: z.array(specificationSchema).optional(),
+  options: z.array(productOptionSchema),
   variants: z
     .array(
       z.object({
-        color: z.string().optional(),
-        size: z.string().optional(),
+        options: z.array(variantOptionSchema),
         sku: z.string().min(1, 'SKU is required'),
         stock: z.string().min(1, 'Stock is required'),
         price: z.string().optional(),
-        // Shipping dimensions (for UniUni)
-        length: z.string().optional(), // cm
-        width: z.string().optional(),  // cm
-        height: z.string().optional(), // cm
-        weight: z.string().optional(), // kg
+        length: z.string().optional(),
+        width: z.string().optional(),
+        height: z.string().optional(),
+        weight: z.string().optional(),
       })
     )
     .min(1, 'At least one variant is required'),
