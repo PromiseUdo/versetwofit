@@ -132,7 +132,30 @@ export default function ProductClient({
     : 0;
 
   const selectOption = (optionName: string, value: string) => {
-    setSelectedOptions((prev) => ({ ...prev, [optionName]: value }));
+    const optIndex = product.options.findIndex((o) => o.name === optionName);
+    setSelectedOptions((prev) => {
+      const next = { ...prev, [optionName]: value };
+      // When the first option changes, cascade to fix subsequent selections
+      if (optIndex === 0 && product.options.length > 1) {
+        for (let i = 1; i < product.options.length; i++) {
+          const opt = product.options[i];
+          const currentStillValid = product.variants.some(
+            (v) => v.options.every((o) => next[o.name] === o.value) && v.stock > 0
+          );
+          if (!currentStillValid) {
+            const firstAvailable = opt.values.find((val) =>
+              product.variants.some(
+                (v) =>
+                  v.options.every((o) => ({ ...next, [opt.name]: val }[o.name] === o.value)) &&
+                  v.stock > 0
+              )
+            );
+            if (firstAvailable !== undefined) next[opt.name] = firstAvailable;
+          }
+        }
+      }
+      return next;
+    });
     setQuantity(1);
   };
 
@@ -301,40 +324,42 @@ export default function ProductClient({
 
             {/* Dynamic Option Selectors */}
             <div className="flex flex-col mt-6 gap-6">
-              {product.options.map((opt) => (
-                <div key={opt.name}>
-                  <p className="uppercase text-sm text-zinc-600 mb-2">
-                    {opt.name}
-                    {selectedOptions[opt.name] && (
-                      <span className="ml-2 normal-case font-normal text-zinc-500">
-                        — {selectedOptions[opt.name]}
-                      </span>
-                    )}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {opt.values.map((val) => {
-                      const isSelected = selectedOptions[opt.name] === val;
-                      const available = isValueAvailable(opt.name, val);
-                      return (
-                        <button
-                          key={val}
-                          onClick={() => available && selectOption(opt.name, val)}
-                          disabled={!available}
-                          className={`px-4 py-2 rounded-md border text-sm font-medium transition-all ${
-                            isSelected
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : available
-                              ? "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100"
-                              : "bg-zinc-50 text-zinc-400 border-zinc-200 line-through cursor-not-allowed"
-                          }`}
-                        >
-                          {val}
-                        </button>
-                      );
-                    })}
+              {product.options.map((opt, optIndex) => {
+                const visibleValues =
+                  optIndex === 0
+                    ? opt.values
+                    : opt.values.filter((val) => isValueAvailable(opt.name, val));
+                return (
+                  <div key={opt.name}>
+                    <p className="uppercase text-sm text-zinc-600 mb-2">
+                      {opt.name}
+                      {selectedOptions[opt.name] && (
+                        <span className="ml-2 normal-case font-normal text-zinc-500">
+                          — {selectedOptions[opt.name]}
+                        </span>
+                      )}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {visibleValues.map((val) => {
+                        const isSelected = selectedOptions[opt.name] === val;
+                        return (
+                          <button
+                            key={val}
+                            onClick={() => selectOption(opt.name, val)}
+                            className={`px-4 py-2 rounded-md border text-sm font-medium transition-all ${
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-white text-zinc-900 border-zinc-300 hover:bg-zinc-100"
+                            }`}
+                          >
+                            {val}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Stock Status */}
               {selectedVariant && (
