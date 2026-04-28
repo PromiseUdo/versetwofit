@@ -36,10 +36,7 @@ function generateOrderNumber(): string {
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = session?.user?.id ?? null;
 
     const body = await req.json();
     const {
@@ -109,7 +106,7 @@ export async function POST(req: NextRequest) {
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        userId: session.user.id,
+        ...(userId ? { user: { connect: { id: userId } } } : {}),
 
         // Contact info
         email,
@@ -307,7 +304,6 @@ export async function POST(req: NextRequest) {
       metadata: {
         orderId: order.id,
         orderNumber: orderNumber,
-        userId: session.user.id,
         uniUniOrderNumber: uniUniShipment?.orderNumber || '',
         paymentMethod,
       },

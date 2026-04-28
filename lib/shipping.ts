@@ -13,7 +13,6 @@ export type ShippingMethod = {
   carrier?: string;
 };
 
-// These will be dynamically populated from UniUni API
 export const SHIPPING_METHODS: ShippingMethod[] = [
   {
     id: 'standard',
@@ -21,22 +20,6 @@ export const SHIPPING_METHODS: ShippingMethod[] = [
     description: 'Delivery in 5-7 business days',
     price: 12.99,
     estimatedDays: '5-7 business days',
-    carrier: 'UniUni',
-  },
-  {
-    id: 'next_day',
-    name: 'Next Day Shipping',
-    description: 'Delivery in 1 business day',
-    price: 24.99,
-    estimatedDays: '1 business day',
-    carrier: 'UniUni',
-  },
-  {
-    id: 'same_day',
-    name: 'Same Day Shipping',
-    description: 'Same day delivery',
-    price: 39.99,
-    estimatedDays: 'Same day',
     carrier: 'UniUni',
   },
 ];

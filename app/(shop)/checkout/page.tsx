@@ -119,17 +119,9 @@ export default function CheckoutPage() {
     "Fetched rate:",
     fetchedShippingRate,
   );
-  // Redirect if not authenticated
+  // Redirect if cart is empty (works for both guests and logged-in users)
   useEffect(() => {
-    if (status === "unauthenticated") {
-      toast.error("Please sign in to checkout");
-      router.push("/login?callbackUrl=/checkout");
-    }
-  }, [status, router]);
-
-  // Redirect if cart is empty
-  useEffect(() => {
-    if (items.length === 0 && status === "authenticated") {
+    if (items.length === 0 && status !== "loading") {
       toast.error("Your cart is empty");
       router.push("/cart");
     }
@@ -328,12 +320,9 @@ export default function CheckoutPage() {
 
       const { clientSecret, orderId } = response.data;
 
-      // Store order ID for confirmation page
-      sessionStorage.setItem("pendingOrderId", orderId);
-
-      // Redirect to payment page with client secret and selected method
+      // Redirect to payment page — email carried so guests can view their confirmation
       router.push(
-        `/checkout/payment?client_secret=${clientSecret}&order_id=${orderId}&payment_method=${selectedPaymentMethod}`,
+        `/checkout/payment?client_secret=${clientSecret}&order_id=${orderId}&payment_method=${selectedPaymentMethod}&email=${encodeURIComponent(shippingInfo.email)}`,
       );
     } catch (error: any) {
       console.error("Payment intent creation error:", error);

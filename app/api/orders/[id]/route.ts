@@ -12,8 +12,11 @@ export async function GET(
 
   try {
     const session = await getServerSession(authOptions);
+    const { searchParams } = new URL(request.url);
+    const guestEmail = searchParams.get('email')?.toLowerCase().trim() ?? null;
 
-    if (!session?.user?.id) {
+    // At least one of: active session OR guest email must be present
+    if (!session?.user?.id && !guestEmail) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -39,9 +42,17 @@ export async function GET(
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    // Verify order belongs to user (or user is admin)
-    if (order.userId !== session.user.id && session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    if (session?.user?.id) {
+      // Logged-in path: must own the order or be admin (unchanged)
+      if (order.userId !== session.user.id && session.user.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      }
+    } else {
+      // Guest path: email must match the order's email
+      const orderEmail = (order.email ?? order.customerEmail ?? '').toLowerCase().trim();
+      if (!guestEmail || guestEmail !== orderEmail) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      }
     }
 
     // Format response

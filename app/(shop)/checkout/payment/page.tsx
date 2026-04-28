@@ -18,11 +18,13 @@ function PaymentPageContent() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "klarna">("card");
+  const [email, setEmail] = useState<string>("");
 
   useEffect(() => {
     const secret = searchParams.get("client_secret");
     const order = searchParams.get("order_id");
     const method = searchParams.get("payment_method");
+    const emailParam = searchParams.get("email") ?? "";
 
     if (!secret || !order) {
       router.push("/checkout");
@@ -31,6 +33,7 @@ function PaymentPageContent() {
 
     setClientSecret(secret);
     setOrderId(order);
+    setEmail(emailParam);
     if (method === "klarna") setPaymentMethod("klarna");
   }, [searchParams, router]);
 
@@ -67,7 +70,7 @@ function PaymentPageContent() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <Elements stripe={stripePromise} options={options}>
-          <CheckoutForm orderId={orderId} paymentMethod={paymentMethod} />
+          <CheckoutForm orderId={orderId} paymentMethod={paymentMethod} email={email} />
         </Elements>
       </div>
     </div>

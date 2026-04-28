@@ -59,12 +59,14 @@ function OrderConfirmationContent() {
       return;
     }
 
-    fetchOrderDetails(orderId);
+    const email = searchParams.get('email') ?? '';
+    fetchOrderDetails(orderId, email);
   }, [searchParams]);
 
-  const fetchOrderDetails = async (orderId: string) => {
+  const fetchOrderDetails = async (orderId: string, email: string) => {
     try {
-      const response = await axios.get(`/api/orders/${orderId}`);
+      const params = email ? `?email=${encodeURIComponent(email)}` : '';
+      const response = await axios.get(`/api/orders/${orderId}${params}`);
       setOrder(response.data);
     } catch (err: any) {
       console.error('Failed to fetch order:', err);

@@ -15,11 +15,13 @@ import toast from "react-hot-toast";
 interface CheckoutFormProps {
   orderId: string;
   paymentMethod?: "card" | "klarna";
+  email?: string;
 }
 
 export default function CheckoutForm({
   orderId,
   paymentMethod = "card",
+  email = "",
 }: CheckoutFormProps) {
   const router = useRouter();
   const stripe = useStripe();
@@ -48,11 +50,14 @@ export default function CheckoutForm({
     setIsLoading(true);
     setMessage(null);
 
+    const emailParam = email ? `&email=${encodeURIComponent(email)}` : "";
+    const confirmationUrl = `/order-confirmation?order_id=${orderId}${emailParam}`;
+
     try {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/order-confirmation?order_id=${orderId}`,
+          return_url: `${window.location.origin}${confirmationUrl}`,
         },
         redirect: "if_required",
       });
@@ -67,10 +72,15 @@ export default function CheckoutForm({
           toast.error("An unexpected error occurred");
         }
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        // Payment succeeded
+        // Payment succeeded — send confirmation email then navigate
         toast.success("Payment successful!");
         clearCart();
-        router.push(`/order-confirmation?order_id=${orderId}`);
+        try {
+          await fetch(`/api/orders/${orderId}/send-confirmation`, { method: "POST" });
+        } catch {
+          // Non-fatal: email failure should not block the user
+        }
+        router.push(confirmationUrl);
       } else {
         setMessage("Payment processing. Please wait...");
       }

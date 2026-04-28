@@ -218,6 +218,7 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { uniUniClient } from '@/lib/uniuni-client';
+import { sendOrderConfirmationEmail } from '@/lib/mailer';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
@@ -329,6 +330,42 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
             },
           },
         });
+      }
+    }
+
+    // 4. Send order confirmation email
+    const recipientEmail = order.email || order.customerEmail;
+    if (recipientEmail) {
+      try {
+        await sendOrderConfirmationEmail({
+          to: recipientEmail,
+          orderNumber: order.orderNumber,
+          firstName: order.shippingFirstName,
+          items: order.items.map((item) => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+            color: item.color,
+            size: item.size,
+          })),
+          subtotal: order.subtotal,
+          shippingCost: order.shippingCost,
+          tax: order.tax,
+          total: order.total,
+          shippingAddress: {
+            street: order.shippingStreet,
+            apartment: order.shippingApartment,
+            city: order.shippingCity,
+            province: order.shippingProvince,
+            postalCode: order.shippingPostalCode,
+            country: order.shippingCountry,
+          },
+        });
+        console.log(`📧 Confirmation email sent to ${recipientEmail}`);
+      } catch (emailError) {
+        // Never fail the webhook because of email — log and move on
+        console.error('❌ Failed to send confirmation email:', emailError);
       }
     }
 
