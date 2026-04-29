@@ -59,6 +59,9 @@ export async function GET(
     const formattedOrder = {
       id: order.id,
       orderNumber: order.orderNumber,
+      subtotal: order.subtotal,
+      shippingCost: order.shippingCost,
+      tax: order.tax,
       totalAmount: order.totalAmount,
       status: order.status,
       paymentStatus: order.paymentStatus,

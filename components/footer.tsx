@@ -94,7 +94,7 @@ export function Footer() {
                 { label: "My Orders", href: "/orders" },
                 { label: "My Account", href: "/account" },
                 { label: "Wishlist", href: "/wishlist" },
-                { label: "Contact Us", href: "mailto:hello@versetwofit.com" },
+                { label: "Contact Us", href: "/contact" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link

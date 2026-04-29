@@ -31,19 +31,30 @@ interface OrderDetails {
   orderNumber: string;
   status: string;
   paymentStatus: string;
+  subtotal: number;
+  shippingCost: number;
+  tax: number;
   totalAmount: number;
   customerEmail: string;
   customerPhone: string | null;
-  shippingAddress: {
-    firstName: string;
-    lastName: string;
-    street: string;
-    apartment?: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
+  shippingAddress: string | null;
+  shippingFirstName: string;
+  shippingLastName: string;
+  shippingCountry: string;
+  shippingPostalCode: string;
+  shippingProvince: string;
+  shippingStreet: string;
+  shippingCity: string;
+  // shippingAddress: {
+  //   firstName: string;
+  //   lastName: string;
+  //   street: string;
+  //   apartment?: string;
+  //   city: string;
+  //   state: string;
+  //   zipCode: string;
+  //   country: string;
+  // };
   billingAddress: any;
   createdAt: string;
   items: Array<{
@@ -147,6 +158,8 @@ export default function OrderDetailPage() {
     try {
       const response = await axios.get(`/api/orders/${params.id}`);
       setOrder(response.data);
+
+      console.log(response.data, 'order');
     } catch (error: any) {
       console.error('Failed to fetch order:', error);
       toast.error('Failed to load order details');
@@ -183,7 +196,7 @@ export default function OrderDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto text-indigo-600 mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary mb-4" />
           <p className="text-gray-600">Loading order details...</p>
         </div>
       </div>
@@ -200,7 +213,7 @@ export default function OrderDetailPage() {
           </h2>
           <Link
             href="/orders"
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
+            className="text-primary hover:text-primary/80 font-medium"
           >
             Back to Orders
           </Link>
@@ -241,7 +254,7 @@ export default function OrderDetailPage() {
 
               <span
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm ${getStatusColor(
-                  order.status
+                  order.status,
                 )}`}
               >
                 {order.status === 'DELIVERED' && <CheckCircle size={18} />}
@@ -348,7 +361,7 @@ export default function OrderDetailPage() {
                       <div className="flex-1 min-w-0">
                         <Link
                           href={`/products/${item.productSlug}`}
-                          className="font-semibold text-gray-900 hover:text-indigo-600 transition line-clamp-2"
+                          className="font-semibold text-gray-900 hover:text-primary transition line-clamp-2"
                         >
                           {item.name}
                         </Link>
@@ -369,9 +382,27 @@ export default function OrderDetailPage() {
                   ))}
                 </div>
 
-                {/* Order Total */}
-                <div className="mt-6 pt-6 border-t">
-                  <div className="flex justify-between items-center">
+                {/* Order Total Breakdown */}
+                <div className="mt-6 pt-6 border-t space-y-3">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Subtotal</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(order.subtotal)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Delivery cost</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(order.shippingCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Tax</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(order.tax)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-3 border-t">
                     <span className="text-lg font-bold text-gray-900">
                       Order Total
                     </span>
@@ -383,17 +414,17 @@ export default function OrderDetailPage() {
               </div>
 
               {/* Quick Actions */}
-              <div className=" rounded-xl p-6 border border-indigo-100">
+              <div className="rounded-xl p-6 border border-primary/20">
                 <h3 className="font-semibold text-gray-900 mb-4">Need Help?</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition font-medium text-sm">
-                    <MessageCircle size={18} />
+                <div className="grid grid-cols-1  gap-3">
+                  <button className="flex w-full items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition font-medium text-sm">
+                    <MessageCircle size={18} className="text-primary" />
                     Contact Support
                   </button>
-                  <button className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition font-medium text-sm">
-                    <Download size={18} />
+                  {/* <button className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition font-medium text-sm">
+                    <Download size={18} className="text-primary" />
                     Download Invoice
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
@@ -403,30 +434,29 @@ export default function OrderDetailPage() {
               {/* Shipping Address */}
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <MapPin className="text-indigo-600" size={20} />
+                  <MapPin className="text-primary" size={20} />
                   <h3 className="font-bold text-gray-900">Shipping Address</h3>
                 </div>
                 <div className="text-gray-700 space-y-1 text-sm">
                   <p className="font-medium text-gray-900">
-                    {order.shippingAddress.firstName}{' '}
-                    {order.shippingAddress.lastName}
+                    {order.shippingFirstName} {order.shippingLastName}
                   </p>
-                  <p>{order.shippingAddress.street}</p>
-                  {order.shippingAddress.apartment && (
+                  <p>{order.shippingStreet}</p>
+                  {/* {order.shippingAddress.apartment && (
                     <p>{order.shippingAddress.apartment}</p>
-                  )}
+                  )} */}
                   <p>
-                    {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
-                    {order.shippingAddress.zipCode}
+                    {order.shippingCity}, {order.shippingProvince}{' '}
+                    {order.shippingPostalCode}
                   </p>
-                  <p>{order.shippingAddress.country || 'United States'}</p>
+                  <p>{order.shippingCountry || 'Canada'}</p>
                 </div>
               </div>
 
               {/* Contact Information */}
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Mail className="text-indigo-600" size={20} />
+                  <Mail className="text-primary" size={20} />
                   <h3 className="font-bold text-gray-900">Contact Info</h3>
                 </div>
                 <div className="space-y-3 text-sm">
@@ -449,7 +479,7 @@ export default function OrderDetailPage() {
               {/* Payment Info */}
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <CreditCard className="text-indigo-600" size={20} />
+                  <CreditCard className="text-primary" size={20} />
                   <h3 className="font-bold text-gray-900">Payment</h3>
                 </div>
                 <div className="space-y-2 text-sm">
@@ -460,8 +490,8 @@ export default function OrderDetailPage() {
                         order.paymentStatus === 'CAPTURED'
                           ? 'text-green-600'
                           : order.paymentStatus === 'FAILED'
-                          ? 'text-red-600'
-                          : 'text-yellow-600'
+                            ? 'text-red-600'
+                            : 'text-yellow-600'
                       }`}
                     >
                       {order.paymentStatus}
@@ -477,7 +507,7 @@ export default function OrderDetailPage() {
               {/* Reorder Button */}
               <Link
                 href="/products"
-                className="block w-full px-6 py-3 bg-indigo-600 text-white text-center rounded-lg hover:bg-indigo-700 transition font-semibold"
+                className="block w-full px-6 py-3 bg-primary text-white text-center rounded-lg hover:bg-primary/90 transition font-semibold"
               >
                 Shop Again
               </Link>

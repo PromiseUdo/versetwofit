@@ -108,6 +108,8 @@ export default function OrdersPage() {
       });
 
       setOrders(response.data.orders);
+
+      // console.log(response.data.orders, 'orders');
       setTotalPages(response.data.pagination.totalPages);
     } catch (error: any) {
       console.error('Failed to fetch orders:', error);
@@ -152,26 +154,32 @@ export default function OrdersPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
-              <p className="text-sm text-gray-500">Manage your purchase history</p>
+              <p className="text-sm text-gray-500">
+                Manage your purchase history
+              </p>
             </div>
-            
+
             {/* Compact Filters */}
             <div className="flex overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
               <div className="flex bg-gray-100 p-1 rounded-lg">
                 {[
                   { value: 'all', label: 'All' },
-                  { value: 'active', label: 'Active', statusGroup: ['pending', 'processing', 'shipped'] },
+                  {
+                    value: 'active',
+                    label: 'Active',
+                    statusGroup: ['pending', 'processing', 'shipped'],
+                  },
                   { value: 'delivered', label: 'Completed' },
                   { value: 'cancelled', label: 'Cancelled' },
                 ].map((filter) => {
-                   // Simplified filter logic for display purposes, mapping back to API status
-                   // in a real app you might want to adjust the API to handle groups or keep simple status
-                   // For now, sticking to simple status mapping or 'all'
-                   // Let's stick to the granular statuses but present them cleaner if needed.
-                   // Actually, let's keep the user's specific status request from the plan but simplify visuals.
-                   return null;
+                  // Simplified filter logic for display purposes, mapping back to API status
+                  // in a real app you might want to adjust the API to handle groups or keep simple status
+                  // For now, sticking to simple status mapping or 'all'
+                  // Let's stick to the granular statuses but present them cleaner if needed.
+                  // Actually, let's keep the user's specific status request from the plan but simplify visuals.
+                  return null;
                 })}
-                 {[
+                {[
                   { value: 'all', label: 'All' },
                   { value: 'pending', label: 'Pending' },
                   { value: 'processing', label: 'Processing' },
@@ -181,14 +189,14 @@ export default function OrdersPage() {
                   <button
                     key={filter.value}
                     onClick={() => {
-                        setSelectedStatus(filter.value);
-                        setCurrentPage(1);
+                      setSelectedStatus(filter.value);
+                      setCurrentPage(1);
                     }}
                     className={cn(
                       'px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap',
                       selectedStatus === filter.value
                         ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-900'
+                        : 'text-gray-500 hover:text-gray-900',
                     )}
                   >
                     {filter.label}
@@ -202,14 +210,19 @@ export default function OrdersPage() {
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 bg-gray-50 rounded-lg animate-pulse" />
+                <div
+                  key={i}
+                  className="h-24 bg-gray-50 rounded-lg animate-pulse"
+                />
               ))}
             </div>
           ) : orders.length === 0 ? (
             <div className="text-center py-16 bg-gray-50 rounded-lg border border-dashed border-gray-200">
               <ShoppingBag className="w-8 h-8 mx-auto text-gray-300 mb-3" />
               <p className="text-gray-900 font-medium mb-1">No orders found</p>
-              <p className="text-xs text-gray-500 mb-4">You haven't placed any orders with this status.</p>
+              <p className="text-xs text-gray-500 mb-4">
+                You haven't placed any orders with this status.
+              </p>
               <Link
                 href="/products"
                 className="inline-flex items-center text-sm font-medium text-primary hover:underline"
@@ -230,68 +243,76 @@ export default function OrdersPage() {
                     className="group block bg-white border border-gray-100 rounded-lg p-4 hover:border-primary/30 hover:shadow-sm transition-all duration-200"
                   >
                     <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-                      
                       {/* Left: Essential Info */}
                       <div className="flex-shrink-0 min-w-[140px]">
-                         <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono text-sm font-semibold text-gray-900">#{order.orderNumber}</span>
-                         </div>
-                         <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                             <Calendar size={12} />
-                             {formatDate(order.createdAt)}
-                         </div>
-                         <span
-                            className={cn(
-                              'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border',
-                              statusConfig.color
-                            )}
-                          >
-                            <StatusIcon size={10} />
-                            {statusConfig.label}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-sm font-semibold text-gray-900">
+                            #{order.orderNumber}
                           </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                          <Calendar size={12} />
+                          {formatDate(order.createdAt)}
+                        </div>
+                        <span
+                          className={cn(
+                            'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border',
+                            statusConfig.color,
+                          )}
+                        >
+                          <StatusIcon size={10} />
+                          {statusConfig.label}
+                        </span>
                       </div>
 
                       {/* Middle: Product Thumbnails */}
                       <div className="flex-1 min-w-0">
-                         <div className="flex items-center gap-2">
-                            {order.items.slice(0, 4).map((item) => (
-                                <div key={item.id} className="relative w-10 h-10 bg-gray-50 rounded border border-gray-100 overflow-hidden flex-shrink-0">
-                                    {item.image ? (
-                                        <Image 
-                                            src={item.image} 
-                                            alt={item.name} 
-                                            fill 
-                                            className="object-cover" 
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            <Package size={14} className="text-gray-300"/>
-                                        </div>
-                                    )}
+                        <div className="flex items-center gap-2">
+                          {order.items.slice(0, 4).map((item) => (
+                            <div
+                              key={item.id}
+                              className="relative w-10 h-10 bg-gray-50 rounded border border-gray-100 overflow-hidden flex-shrink-0"
+                            >
+                              {item.image ? (
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Package
+                                    size={14}
+                                    className="text-gray-300"
+                                  />
                                 </div>
-                            ))}
-                            {order.items.length > 4 && (
-                                <div className="w-10 h-10 rounded border border-gray-100 bg-gray-50 flex items-center justify-center text-xs font-medium text-gray-500">
-                                    +{order.items.length - 4}
-                                </div>
-                            )}
-                         </div>
-                         <p className="text-xs text-gray-500 mt-1.5 truncate">
-                            {order.items.map(i => i.name).join(', ')}
-                         </p>
+                              )}
+                            </div>
+                          ))}
+                          {order.items.length > 4 && (
+                            <div className="w-10 h-10 rounded border border-gray-100 bg-gray-50 flex items-center justify-center text-xs font-medium text-gray-500">
+                              +{order.items.length - 4}
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1.5 truncate">
+                          {order.items.map((i) => i.name).join(', ')}
+                        </p>
                       </div>
 
                       {/* Right: Total & Action */}
                       <div className="flex items-center justify-between sm:justify-end gap-6 sm:min-w-[120px]">
-                         <div className="text-right">
-                             <p className="text-xs text-gray-500">Total</p>
-                             <p className="text-sm font-bold text-gray-900">{formatCurrency(order.totalAmount)}</p>
-                         </div>
-                         <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-primary group-hover:text-white transition-colors">
-                            <ChevronRight size={16} />
-                         </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500">Total</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            {formatCurrency(order.totalAmount)}
+                          </p>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-primary group-hover:text-white transition-colors">
+                          <ChevronRight size={16} />
+                        </div>
                       </div>
-
                     </div>
                   </Link>
                 );
@@ -304,8 +325,8 @@ export default function OrdersPage() {
             <div className="mt-8 flex items-center justify-center gap-2">
               <button
                 onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((prev) => Math.max(1, prev - 1));
+                  e.preventDefault();
+                  setCurrentPage((prev) => Math.max(1, prev - 1));
                 }}
                 disabled={currentPage === 1}
                 className="p-2 bg-white border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -317,8 +338,8 @@ export default function OrdersPage() {
               </span>
               <button
                 onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                  e.preventDefault();
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                 }}
                 disabled={currentPage === totalPages}
                 className="p-2 bg-white border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
