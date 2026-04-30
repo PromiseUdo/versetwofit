@@ -55,13 +55,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📬 UniUni Webhook Received');
+  console.log(`   Event: ${event.event}`);
+  console.log(`   Version: ${event.version}`);
+  console.log('   Payload:', JSON.stringify(event.data, null, 2));
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
   try {
     switch (event.event) {
       case 'shipment.status_updated':
-        await handleShipmentStatusUpdated(event.data as unknown as ShipmentEventData);
+        await handleShipmentStatusUpdated(
+          event.data as unknown as ShipmentEventData,
+        );
         break;
       case 'shipment.custom_event':
-        console.log('UniUni custom shipment event:', JSON.stringify(event.data));
+        console.log(
+          'UniUni custom shipment event:',
+          JSON.stringify(event.data),
+        );
         break;
       case 'insurance.status_updated':
         console.log('UniUni insurance event:', JSON.stringify(event.data));
@@ -95,7 +107,9 @@ async function handleShipmentStatusUpdated(data: ShipmentEventData) {
   });
 
   if (!order) {
-    console.error(`❌ UniUni webhook: no order found for trackingId ${trackingId}`);
+    console.error(
+      `❌ UniUni webhook: no order found for trackingId ${trackingId}`,
+    );
     return;
   }
 
@@ -104,7 +118,9 @@ async function handleShipmentStatusUpdated(data: ShipmentEventData) {
     data: { status: orderStatus },
   });
 
-  console.log(`✅ Order ${order.orderNumber} → ${orderStatus} (trackingId: ${trackingId})`);
+  console.log(
+    `✅ Order ${order.orderNumber} → ${orderStatus} (trackingId: ${trackingId})`,
+  );
 }
 
 interface UniUniWebhookPayload {
