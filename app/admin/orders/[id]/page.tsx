@@ -288,21 +288,30 @@ export default function OrderDetailsPage() {
             )}
 
             {(order.uniUniOrderNumber || order.trackingNumber) && (
-              <div className="mt-4 pt-4 border-t border-neutral-700 space-y-2 text-xs">
+              <div className="mt-4 pt-4 border-t border-neutral-700 space-y-3 text-xs">
                 {order.uniUniOrderNumber && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-gray-500">UniUni Order Number</span>
-                    <span className="text-white font-mono">
+                    <span className="text-gray-500">UniUni Order #</span>
+                    <span className="text-white font-mono break-all">
                       {order.uniUniOrderNumber}
                     </span>
                   </div>
                 )}
                 {order.trackingNumber && (
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1.5">
                     <span className="text-gray-500">Tracking Number</span>
-                    <span className="text-white font-mono">
+                    <span className="text-white font-mono break-all">
                       {order.trackingNumber}
                     </span>
+                    <a
+                      href={`https://www.uniuni.com/tracking/?trackingNo=${order.trackingNumber}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 flex items-center justify-center gap-1.5 w-full px-3 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition text-xs font-medium"
+                    >
+                      <Truck size={13} />
+                      Track Shipment on UniUni
+                    </a>
                   </div>
                 )}
               </div>

@@ -313,6 +313,23 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
         console.log(`🚀 Finalizing UniUni Shipment: ${uniUniOrderNumber}`);
         await uniUniClient.confirmShipment(uniUniOrderNumber);
         console.log(`✅ UniUni Shipment ${uniUniOrderNumber} confirmed successfully.`);
+
+        // Fetch the shipment to get its trackingId and persist it so the
+        // UniUni webhook can look up orders by tracking number later.
+        try {
+          const shipmentDetails = await uniUniClient.getShipment(uniUniOrderNumber);
+          const trackingId =
+            shipmentDetails?.data?.trackingId ?? shipmentDetails?.trackingId;
+          if (trackingId) {
+            await prisma.order.update({
+              where: { id: orderId },
+              data: { trackingNumber: trackingId },
+            });
+            console.log(`📦 Tracking number saved: ${trackingId}`);
+          }
+        } catch (trackingError) {
+          console.error('⚠️ Could not fetch/save tracking number:', trackingError);
+        }
       } catch (uniError) {
         // Log error but don't fail the webhook; admin can fix manually if balance was low.
         console.error('❌ UniUni confirmation failed:', uniError);

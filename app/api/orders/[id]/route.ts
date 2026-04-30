@@ -77,6 +77,7 @@ export async function GET(
       shippingPostalCode: order.shippingPostalCode,
       shippingCountry: order.shippingCountry,
       billingAddress: order.billingAddress,
+      trackingNumber: order.trackingNumber,
       createdAt: order.createdAt.toISOString(),
       items: order.items.map((item: any) => ({
         id: item.id,

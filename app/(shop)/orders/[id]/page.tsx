@@ -45,6 +45,7 @@ interface OrderDetails {
   shippingProvince: string;
   shippingStreet: string;
   shippingCity: string;
+  trackingNumber: string | null;
   // shippingAddress: {
   //   firstName: string;
   //   lastName: string;
@@ -503,6 +504,31 @@ export default function OrderDetailPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Tracking */}
+              {order.trackingNumber && (
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Truck className="text-primary" size={20} />
+                    <h3 className="font-bold text-gray-900">Track Package</h3>
+                  </div>
+
+                  <p className="text-xs text-gray-500 mb-1">Tracking Number</p>
+                  <p className="font-mono text-sm font-semibold text-gray-900 break-all mb-4">
+                    {order.trackingNumber}
+                  </p>
+
+                  <a
+                    href={`https://www.uniuni.com/tracking/?trackingNo=${order.trackingNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-semibold text-sm"
+                  >
+                    <Truck size={15} />
+                    Track on UniUni
+                  </a>
+                </div>
+              )}
 
               {/* Reorder Button */}
               <Link
