@@ -10,7 +10,7 @@ export function Footer() {
       <MaxWidthWrapper>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand Column */}
-          <div className="md:col-span-1">
+          <div className="md:col-span-2">
             <Link href="/" className="inline-block mb-5">
               <Image
                 src="/logo.png"
@@ -20,7 +20,7 @@ export function Footer() {
                 className=""
               />
             </Link>
-            <p className="text-sm leading-relaxed text-gray-500 mb-6">
+            <p className="text-sm leading-relaxed text-gray-500 mb-6 max-w-xs">
               Fashion for those who move with purpose. Quality pieces,
               thoughtfully made.
             </p>
@@ -66,11 +66,10 @@ export function Footer() {
             </h3>
             <ul className="space-y-3 text-sm">
               {[
-                { label: "New Arrivals", href: "/products" },
-                { label: "T-Shirts", href: "/category/t-shirts" },
-                { label: "Headwear", href: "/category/headwears" },
-                { label: "Accessories", href: "/category/accessories" },
-                // { label: "All Products", href: "/products" },
+                { label: "New Arrivals", href: "/products?filter=new-arrivals" },
+                { label: "T-Shirts", href: "/products?category=t-shirts" },
+                { label: "Headwear", href: "/products?category=headwear" },
+                { label: "Accessories", href: "/products?category=accessories" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -84,10 +83,10 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Customer Care Column */}
+          {/* Help Column */}
           <div>
             <h3 className="text-gray-900 font-semibold mb-4 text-sm uppercase tracking-wider">
-              Customer Care
+              Help
             </h3>
             <ul className="space-y-3 text-sm">
               {[
@@ -107,40 +106,31 @@ export function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Info Column */}
-          <div>
-            <h3 className="text-gray-900 font-semibold mb-4 text-sm uppercase tracking-wider">
-              Information
-            </h3>
-            <ul className="space-y-3 text-sm">
-              {[
-                { label: "About Us", href: "/about" },
-                { label: "Shipping & Delivery", href: "/shipping" },
-                // { label: "Returns & Exchanges", href: "/returns" },
-                { label: "Terms & Conditions", href: "/terms" },
-                { label: "Privacy Policy", href: "/privacy" },
-              ].map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="hover:text-gray-900 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
         <hr className="border-gray-200 mb-6" />
 
         {/* Footer Bottom */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pb-8">
-          <p className="text-sm text-gray-500">
-            © {currentYear} Verse Two Fit. All rights reserved.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-5 text-sm text-gray-400">
+            <p>© {currentYear} Verse Two Fit. All rights reserved.</p>
+            <span className="hidden sm:block text-gray-200">|</span>
+            <div className="flex items-center gap-4">
+              {[
+                { label: "About", href: "/about" },
+                { label: "Shipping & Delivery", href: "/shipping" },
+                { label: "Privacy Policy", href: "/privacy" },
+              ].map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="hover:text-gray-700 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
 
           {/* Payment Method Badges */}
           <div className="flex items-center gap-3 flex-wrap justify-center">

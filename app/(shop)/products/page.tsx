@@ -39,11 +39,19 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const currentPage = parseInt(params.page || '1');
   console.log(params, 'searchparams');
 
+  const categoryTitles: Record<string, string> = {
+    't-shirts': 'T-Shirts',
+    'headwear': 'Headwear',
+    'accessories': 'Accessories',
+  };
+
   const title =
     filterType === 'new-arrivals'
       ? 'New Arrivals'
       : filterType === 'featured'
       ? 'Featured Products'
+      : categorySlug && categoryTitles[categorySlug]
+      ? categoryTitles[categorySlug]
       : 'All Products';
 
   return (
