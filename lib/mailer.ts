@@ -1,13 +1,16 @@
 import { Resend } from 'resend';
 import { formatCurrency } from '@/lib/shipping';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const brand = process.env.FROM_NAME ?? 'VerseTwoFits';
-const fromAddress = `${brand} <no-reply@versetwofit.com>`;
-const storeInbox = 'no-reply@versetwofit.com';
 const primary = '#303d32';
 const light = '#f5f5f0';
+
+function getMailer() {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const brand = process.env.FROM_NAME ?? 'VerseTwoFits';
+  const fromAddress = `${brand} <no-reply@versetwofit.com>`;
+  const storeInbox = 'no-reply@versetwofit.com';
+  return { resend, brand, fromAddress, storeInbox };
+}
 
 interface OrderItem {
   name: string;
@@ -40,6 +43,7 @@ interface SendOrderConfirmationParams {
 export async function sendOrderConfirmationEmail(
   params: SendOrderConfirmationParams,
 ) {
+  const { resend, brand, fromAddress } = getMailer();
   const {
     to,
     orderNumber,
@@ -225,6 +229,7 @@ export async function sendPasswordResetEmail(
   name: string,
   resetUrl: string,
 ) {
+  const { resend, brand, fromAddress } = getMailer();
   const firstName = name?.split(' ')[0] ?? 'there';
 
   const html = `
@@ -339,6 +344,7 @@ export async function sendContactEmails({
   subject,
   message,
 }: SendContactEmailsParams) {
+  const { resend, brand, fromAddress, storeInbox } = getMailer();
   const firstName = name.trim().split(' ')[0];
 
   // Notification to store
