@@ -1,6 +1,6 @@
-import { ProductCard } from "@/components/product-card";
-import { prisma } from "@/lib/prisma";
-import { Pagination } from "@/app/(shop)/products/components/pagination";
+import { ProductCard } from '@/components/product-card';
+import { prisma } from '@/lib/prisma';
+import { Pagination } from '@/app/(shop)/products/components/pagination';
 
 interface CategoryProductsContentProps {
   categoryId: string;
@@ -24,14 +24,14 @@ export async function CategoryProductsContent({
   };
 
   // Build orderBy clause
-  let orderBy: any = { createdAt: "desc" };
+  let orderBy: any = { createdAt: 'desc' };
 
-  if (sortBy === "price-asc") {
-    orderBy = { price: "asc" };
-  } else if (sortBy === "price-desc") {
-    orderBy = { price: "desc" };
-  } else if (sortBy === "name") {
-    orderBy = { name: "asc" };
+  if (sortBy === 'price-asc') {
+    orderBy = { price: 'asc' };
+  } else if (sortBy === 'price-desc') {
+    orderBy = { price: 'desc' };
+  } else if (sortBy === 'name') {
+    orderBy = { name: 'asc' };
   }
 
   const [products, total] = await Promise.all([
@@ -42,7 +42,7 @@ export async function CategoryProductsContent({
           select: { name: true },
         },
         variants: {
-          orderBy: { createdAt: "asc" },
+          orderBy: { createdAt: 'asc' },
         },
       },
       orderBy,
@@ -66,7 +66,7 @@ export async function CategoryProductsContent({
 
   return (
     <>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-8">
+      <div className="grid  lg:grid-cols-4 gap-6 px-8">
         {(products as any[]).map((product: any) => (
           <ProductCard key={product.id} product={product} />
         ))}

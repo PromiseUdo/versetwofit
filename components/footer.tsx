@@ -8,9 +8,9 @@ export function Footer() {
   return (
     <footer className="bg-white text-gray-500 pt-16 mt-4 border-t border-gray-100">
       <MaxWidthWrapper>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
           {/* Brand Column */}
-          <div className="md:col-span-2">
+          <div className="col-span-2">
             <Link href="/" className="inline-block mb-5">
               <Image
                 src="/logo.png"

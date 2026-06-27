@@ -1,4 +1,3 @@
-
 // // src/lib/uniuni-client.ts
 // /**
 //  * UniUni Shipping API Client - CORRECTED VERSION
@@ -326,11 +325,6 @@
 //   };
 // }
 
-
-
-
-
-
 /**
  * UniUni Shipping API Client
  * Optimized for Canadian e-commerce integration.
@@ -338,7 +332,9 @@
  */
 
 const UNIUNI_API_BASE_URL =
-  process.env.UNIUNI_API_URL || 'https://api-sandbox.ship.uniuni.com';
+  process.env.UNIUNI_API_URL || 'https://api.ship.uniuni.com/prod';
+// const UNIUNI_API_BASE_URL =
+//   process.env.UNIUNI_API_URL || 'https://api-sandbox.ship.uniuni.com';
 const UNIUNI_ACCESS_TOKEN = process.env.UNIUNI_ACCESS_TOKEN;
 
 if (!UNIUNI_ACCESS_TOKEN) {
@@ -472,7 +468,7 @@ class UniUniClient {
   async confirmShipment(orderNumber: string): Promise<any> {
     const url = `${this.baseUrl}/client/orders/create`;
     const payload = { orderNumbers: [orderNumber] };
-    
+
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log(`💳 UniUni confirmShipment Debug:`);
     console.log(`   URL: ${url}`);
@@ -492,8 +488,12 @@ class UniUniClient {
       console.log(`📥 UniUni Response Body:`, responseText);
 
       if (!response.ok) {
-        const errorData = responseText ? JSON.parse(responseText) : { message: 'Unknown error' };
-        throw new Error(errorData.message || `Confirmation failed: ${response.status}`);
+        const errorData = responseText
+          ? JSON.parse(responseText)
+          : { message: 'Unknown error' };
+        throw new Error(
+          errorData.message || `Confirmation failed: ${response.status}`,
+        );
       }
 
       const result = JSON.parse(responseText);
@@ -540,20 +540,38 @@ class UniUniClient {
     dimensions: UniUniDimensions,
     weight: UniUniWeight,
     shipmentLineItems: ShipmentLineItem[],
-  ): Promise<{
-    postageType: PostageType;
-    postageFee: number;
-    tax: number;
-    total: number;
-    currency: string;
-    orderNumber: string; // Draft order number for potential reuse
-    estimatedDays: string;
-    name: string;
-  }[]> {
-    const postageTypes: { type: PostageType; name: string; estimatedDays: string }[] = [
-      { type: 'STANDARD', name: 'Standard Shipping', estimatedDays: '3-5 business days' },
-      { type: 'NEXT DAY', name: 'Next Day Shipping', estimatedDays: '1 business day' },
-      { type: 'SAME DAY', name: 'Same Day Shipping', estimatedDays: 'Same day' },
+  ): Promise<
+    {
+      postageType: PostageType;
+      postageFee: number;
+      tax: number;
+      total: number;
+      currency: string;
+      orderNumber: string; // Draft order number for potential reuse
+      estimatedDays: string;
+      name: string;
+    }[]
+  > {
+    const postageTypes: {
+      type: PostageType;
+      name: string;
+      estimatedDays: string;
+    }[] = [
+      {
+        type: 'STANDARD',
+        name: 'Standard Shipping',
+        estimatedDays: '3-5 business days',
+      },
+      {
+        type: 'NEXT DAY',
+        name: 'Next Day Shipping',
+        estimatedDays: '1 business day',
+      },
+      {
+        type: 'SAME DAY',
+        name: 'Same Day Shipping',
+        estimatedDays: 'Same day',
+      },
     ];
 
     const rates: any[] = [];
@@ -561,7 +579,7 @@ class UniUniClient {
     for (const { type, name, estimatedDays } of postageTypes) {
       try {
         console.log(`📊 Fetching rate for postage type: ${type}`);
-        
+
         const response = await this.createShipment({
           recipient,
           address,
@@ -583,7 +601,9 @@ class UniUniClient {
           name,
         });
 
-        console.log(`✅ Rate for ${type}: $${response.rates.postageFee} + tax $${response.rates.tax} = $${response.rates.total}`);
+        console.log(
+          `✅ Rate for ${type}: $${response.rates.postageFee} + tax $${response.rates.tax} = $${response.rates.total}`,
+        );
       } catch (error) {
         console.error(`❌ Failed to get rate for ${type}:`, error);
         // Skip this rate if API call fails
@@ -694,9 +714,8 @@ export function estimatePackageDimensions(items: any[]): UniUniDimensions {
   const DEFAULT_WIDTH = 25;
   const DEFAULT_HEIGHT = 15;
 
-
   console.log(items, 'from estimate package dimension');
-  
+
   if (!items || items.length === 0) {
     return {
       length: DEFAULT_LENGTH,
